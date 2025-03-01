@@ -1,0 +1,6 @@
+[versions]
+fawe = "2.12.3"
+
+[libraries]
+fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
+fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
