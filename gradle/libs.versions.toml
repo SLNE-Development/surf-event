@@ -1,6 +1,10 @@
 [versions]
 fawe = "2.12.3"
+intellectualsites = "1.52"
 
 [libraries]
 fawe-core = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Core", version.ref = "fawe" }
 fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", version.ref = "fawe" }
+intellectualsites-bom = { module = "com.intellectualsites.bom:bom-newest", version.ref = "intellectualsites" }
+plotsquared-core = { module = "com.intellectualsites.plotsquared:plotsquared-core" }
+plotsquared-bukkit = { module = "com.intellectualsites.plotsquared:plotsquared-bukkit" }

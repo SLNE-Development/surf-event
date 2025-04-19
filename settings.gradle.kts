@@ -6,3 +6,4 @@ rootProject.name = "surf-event"
 
 include("surf-event-base")
 include("surf-oneblock-skyblock-event")
+include("bmbf-real-event")
