@@ -1,6 +1,8 @@
 package dev.slne.surf.event.bmbf
 
+import com.github.shynixn.mccoroutine.folia.ticks
 import com.plotsquared.core.plot.Plot
+import com.plotsquared.core.plot.flag.implementations.DoneFlag
 import dev.slne.surf.event.bmbf.papi.countdown.BmbfCountdownPlaceholder
 import dev.slne.surf.event.bmbf.util.teleportPlayerSuspend
 import dev.slne.surf.event.bmbf.util.toPlotPlayer
@@ -61,6 +63,9 @@ object BmbfManager {
 
         val plot = plotArea.getNextFreePlot(plotPlayer, null)
         plot.claim(plotPlayer, false, null, true, true)
+        val doneFlag = plot.flagContainer.getFlag(DoneFlag::class.java)
+            .createFlagInstance((System.currentTimeMillis() / 1000).toString())
+        plot.setFlag(doneFlag)
 
         return plot
     }
@@ -83,7 +88,6 @@ object BmbfManager {
 
         forEachPlayerInRegion({ player ->
             player.updateCommands()
-            player.gameMode = GameMode.ADVENTURE
             val plot = getOrCreatePlotForPlayer(player)
             plot.teleportPlayerSuspend(player.toPlotPlayer())
         }, concurrent = true)
@@ -120,7 +124,6 @@ object BmbfManager {
 
             }
 
-
             playCountdownSound()
             delay(1.seconds)
         }
@@ -131,8 +134,10 @@ object BmbfManager {
     private suspend fun startBuilding() {
         if (!running) return
 
-        forEachPlayerInRegion({
-            it.gameMode = GameMode.CREATIVE
+        forEachPlayerInRegion({ player ->
+            player.gameMode = GameMode.CREATIVE
+            val plot = getOrCreatePlotForPlayer(player)
+            plot.removeFlag(DoneFlag::class.java)
         }, concurrent = true)
 
         for (currentSecond in currentChallenge.eventDuration.inWholeSeconds downTo 0) {
@@ -161,11 +166,12 @@ object BmbfManager {
         running = false
         BmbfCountdownPlaceholder.current = Duration.ZERO
 
-        forEachPlayerInRegion({
-            it.gameMode = GameMode.ADVENTURE
-            it.allowFlight = true
-            it.isInvulnerable = true
-            it.updateCommands()
+        forEachPlayerInRegion({ player ->
+            player.updateCommands()
+            val plot = getPlotForPlayer(player) ?: return@forEachPlayerInRegion
+            val doneFlag = plot.flagContainer.getFlag(DoneFlag::class.java)
+                .createFlagInstance((System.currentTimeMillis() / 1000).toString())
+            plot.setFlag(doneFlag)
         }, concurrent = true)
 
         server.sendText {
@@ -189,11 +195,12 @@ object BmbfManager {
 
     suspend fun cancel() {
         reset()
-        forEachPlayerInRegion({
-            it.gameMode = GameMode.ADVENTURE
-            it.allowFlight = true
-            it.isInvulnerable = true
-            it.updateCommands()
+        forEachPlayerInRegion({ player ->
+            player.updateCommands()
+            val plot = getPlotForPlayer(player) ?: return@forEachPlayerInRegion
+            val doneFlag = plot.flagContainer.getFlag(DoneFlag::class.java)
+                .createFlagInstance((System.currentTimeMillis() / 1000).toString())
+            plot.setFlag(doneFlag)
         }, concurrent = true)
 
         server.sendText {
@@ -229,40 +236,37 @@ object BmbfManager {
     }
 
     suspend fun configurePlayerOnJoin(player: Player) {
-        if (!running) {
-            withContext(player.dispatcher()) {
-                with(player) {
-                    gameMode = GameMode.ADVENTURE
-                    allowFlight = true
-                    isInvulnerable = true
-                }
-            }
-        } else {
-            val plot = getOrCreatePlotForPlayer(player)
-            plot.teleportPlayerSuspend(player.toPlotPlayer())
-            withContext(player.dispatcher()) {
-                with(player) {
-                    gameMode = GameMode.CREATIVE
-                    sendText {
-                        appendPrefix()
-                        info("Das Event läuft bereits!")
-                        appendNewPrefixedLine()
-                        info("Aktuelle Kategorie: ")
-                        variableValue(currentCategory.displayName)
-                        append {
-                            variableValue(" (")
-                            val minutes = currentChallenge.eventDuration.inWholeMinutes
-                            if (minutes == 1L) {
-                                variableValue("1 Minute")
-                            } else {
-                                variableValue("$minutes Minuten")
-                            }
-                            variableValue(")")
-                        }
+        delay(3.ticks)
+        withContext(player.dispatcher()) {
+            player.gameMode = GameMode.CREATIVE
+        }
+
+        if (running) {
+            player.sendText {
+                appendPrefix()
+                info("Das Event läuft bereits!")
+                appendNewPrefixedLine()
+                info("Aktuelle Kategorie: ")
+                variableValue(currentCategory.displayName)
+                append {
+                    variableValue(" (")
+                    val minutes = currentChallenge.eventDuration.inWholeMinutes
+                    if (minutes == 1L) {
+                        variableValue("1 Minute")
+                    } else {
+                        variableValue("$minutes Minuten")
                     }
+                    variableValue(")")
                 }
             }
         }
+
+        val plot = getOrCreatePlotForPlayer(player)
+        if (running && DoneFlag.isDone(plot)) {
+            plot.removeFlag(DoneFlag::class.java)
+        }
+
+        plot.teleportPlayerSuspend(player.toPlotPlayer())
     }
 
     private val announceTimesSeconds =

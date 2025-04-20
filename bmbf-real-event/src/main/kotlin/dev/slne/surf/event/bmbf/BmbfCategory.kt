@@ -45,7 +45,7 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
                 SettingsNodesWrapper(
                     arrayOf(
                         createConfigNode("plot.height", ConfigurationUtil.INTEGER, 62),
-                        createConfigNode("plot.size", ConfigurationUtil.INTEGER, 42),
+                        createConfigNode("plot.size", ConfigurationUtil.INTEGER, 48),
                         createConfigNode(
                             "plot.filling",
                             ConfigurationUtil.BLOCK_BUCKET,
@@ -67,7 +67,7 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
                             ConfigurationUtil.BLOCK_BUCKET,
                             BlockBucket(BlockTypes.SANDSTONE_SLAB!!)
                         ),
-                        createConfigNode("road.width", ConfigurationUtil.INTEGER, 7),
+                        createConfigNode("road.width", ConfigurationUtil.INTEGER, 16),
                         createConfigNode("road.height", ConfigurationUtil.INTEGER, 62),
                         createConfigNode(
                             "road.block",
