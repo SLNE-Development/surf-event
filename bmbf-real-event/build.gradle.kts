@@ -16,7 +16,8 @@ surfPaperPluginApi {
 }
 
 dependencies {
-    implementation(platform(libs.intellectualsites.bom))
+    implementation(enforcedPlatform(libs.intellectualsites.bom))
     compileOnly(libs.plotsquared.core)
     compileOnly(libs.plotsquared.bukkit) { isTransitive = false }
+    compileOnly(libs.fawe.core)
 }

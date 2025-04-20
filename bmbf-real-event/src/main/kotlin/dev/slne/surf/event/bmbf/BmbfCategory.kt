@@ -1,11 +1,15 @@
 package dev.slne.surf.event.bmbf
 
 import com.plotsquared.core.PlotSquared
+import com.plotsquared.core.configuration.ConfigurationNode
+import com.plotsquared.core.configuration.ConfigurationUtil
+import com.plotsquared.core.configuration.caption.StaticCaption
+import com.plotsquared.core.plot.BlockBucket
 import com.plotsquared.core.plot.PlotAreaTerrainType
 import com.plotsquared.core.plot.PlotAreaType
 import com.plotsquared.core.setup.PlotAreaBuilder
-import com.plotsquared.core.setup.SetupProcess
-import com.plotsquared.core.util.SetupUtils
+import com.plotsquared.core.setup.SettingsNodesWrapper
+import com.sk89q.worldedit.world.block.BlockTypes
 import dev.slne.surf.surfapi.core.api.util.logger
 
 enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
@@ -33,20 +37,74 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
     private fun setupArea(worldName: String) {
         log.atInfo()
             .log("Creating world for plot area: $worldName")
-//        val world = WorldCreator.name(worldName).createWorld() ?: error("Error creating world: $worldName")
-////        plotAPI.plotSquared.plotAreaManager.addWorld(worldName)
-//        plotAPI.plotSquared.loadWorld(worldName, BukkitPlotGenerator(world.name, world.generator, plotAPI.plotSquared.plotAreaManager))
-
         val builder = PlotAreaBuilder.newBuilder().apply {
-            worldName(worldName)
-            areaName(worldName)
+            generatorName("PlotSquared")
             plotAreaType(PlotAreaType.NORMAL)
+            plotManager(generatorName())
+            settingsNodesWrapper(
+                SettingsNodesWrapper(
+                    arrayOf(
+                        createConfigNode("plot.height", ConfigurationUtil.INTEGER, 62),
+                        createConfigNode("plot.size", ConfigurationUtil.INTEGER, 42),
+                        createConfigNode(
+                            "plot.filling",
+                            ConfigurationUtil.BLOCK_BUCKET,
+                            BlockBucket(BlockTypes.STONE!!)
+                        ),
+                        createConfigNode("wall.place_top_block", ConfigurationUtil.BOOLEAN, true),
+                        createConfigNode(
+                            "plot.floor",
+                            ConfigurationUtil.BLOCK_BUCKET,
+                            BlockBucket(BlockTypes.GRASS_BLOCK!!)
+                        ),
+                        createConfigNode(
+                            "wall.block",
+                            ConfigurationUtil.BLOCK_BUCKET,
+                            BlockBucket(BlockTypes.STONE_SLAB!!)
+                        ),
+                        createConfigNode(
+                            "wall.block_claimed",
+                            ConfigurationUtil.BLOCK_BUCKET,
+                            BlockBucket(BlockTypes.SANDSTONE_SLAB!!)
+                        ),
+                        createConfigNode("road.width", ConfigurationUtil.INTEGER, 7),
+                        createConfigNode("road.height", ConfigurationUtil.INTEGER, 62),
+                        createConfigNode(
+                            "road.block",
+                            ConfigurationUtil.BLOCK_BUCKET,
+                            BlockBucket(BlockTypes.QUARTZ_BLOCK!!)
+                        ),
+                        createConfigNode(
+                            "wall.filling",
+                            ConfigurationUtil.BLOCK_BUCKET,
+                            BlockBucket(BlockTypes.STONE!!)
+                        ),
+                        createConfigNode("wall.height", ConfigurationUtil.INTEGER, 62),
+                        createConfigNode("plot.bedrock", ConfigurationUtil.BOOLEAN, true),
+                        createConfigNode(
+                            "world.component_below_bedrock",
+                            ConfigurationUtil.BOOLEAN,
+                            false
+                        )
+                    ), null
+                )
+            )
+
+            areaName(worldName)
             terrainType(PlotAreaTerrainType.NONE)
+            worldName(worldName)
         }
 
         val setupUtils = PlotSquared.platform().setupUtils()
-        val finalWorldName = setupUtils.setupWorld(builder)
+        setupUtils.setupWorld(builder)
     }
+
+    private fun <T> createConfigNode(
+        key: String,
+        type: ConfigurationUtil.SettingValue<T>,
+        defaultValue: T
+    ) = ConfigurationNode(key, defaultValue, StaticCaption.of(""), type)
+
 
     fun nextCategory(): BmbfCategory? {
         return when (this) {
@@ -60,9 +118,6 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
     }
 
     companion object {
-//        private val setupUtils =
-//            PlotSquared.platform().injector().getInstance(SetupUtils::class.java)
-
         fun createAreas() {
             for (category in entries) {
                 category.createAreas()
