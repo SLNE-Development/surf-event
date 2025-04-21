@@ -12,7 +12,12 @@ surfPaperPluginApi {
     generateLibraryLoader(false)
     serverDependencies {
         registerRequired("PlotSquared")
+        registerRequired("PlaceholderAPI")
     }
+}
+
+repositories {
+    maven("https://repo.extendedclip.com/releases/")
 }
 
 dependencies {
@@ -20,4 +25,5 @@ dependencies {
     compileOnly(libs.plotsquared.core)
     compileOnly(libs.plotsquared.bukkit) { isTransitive = false }
     compileOnly(libs.fawe.core)
+    compileOnly(libs.placeholderapi)
 }
