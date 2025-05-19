@@ -14,28 +14,27 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.entity.Player
 
 private val seperatorColor = TextColor.color(0x97B3F7)
-private val seperatorText = text("|".toSmallCaps(), seperatorColor).decorate(TextDecoration.BOLD)
+private val seperatorText = text("|", seperatorColor).decorate(TextDecoration.BOLD)
 
 @OptIn(ObsoleteScoreboardApi::class)
 fun createBmbfScoreboard(player: Player) =
-    surfBukkitApi.createScoreboard(text("Event".toSmallCaps(), Colors.PRIMARY))
-        .addEmptyLine()
+    surfBukkitApi.createScoreboard(text("ꑎ"))
         .addEmptyLine()
         .addLine(
             text(
-                "Grundstück-Info".toSmallCaps(),
+                "Grundstück-Info",
                 seperatorColor
             ).decorate(TextDecoration.BOLD)
         )
         .addUpdatableLine {
             buildText {
                 seperator()
-                spacer("Besitzer: ".toSmallCaps())
+                spacer("Besitzer: ")
                 text(
                     PlaceholderAPI.setPlaceholders(
                         player,
                         "%plotsquared_currentplot_owner%"
-                    ).ifBlank { "/" }.toSmallCaps(),
+                    ).ifBlank { "/" },
                     Colors.WHITE
                 )
             }
@@ -43,9 +42,9 @@ fun createBmbfScoreboard(player: Player) =
         .addUpdatableLine {
             buildText {
                 seperator()
-                spacer("Kategorie: ".toSmallCaps())
+                spacer("Kategorie: ")
                 text(
-                    BmbfManager.currentCategory.displayName.toSmallCaps(),
+                    BmbfManager.currentCategory.displayName,
                     Colors.WHITE
                 )
             }
@@ -53,9 +52,9 @@ fun createBmbfScoreboard(player: Player) =
         .addUpdatableLine {
             buildText {
                 seperator()
-                spacer("Zeit für Aufgabe: ".toSmallCaps())
+                spacer("Zeit für Aufgabe: ")
                 text(
-                    BmbfManager.currentChallenge.eventDuration.toString().toSmallCaps(),
+                    BmbfManager.currentChallenge.eventDuration.toString(),
                     Colors.WHITE
                 )
             }
@@ -63,17 +62,72 @@ fun createBmbfScoreboard(player: Player) =
         .addUpdatableLine {
             buildText {
                 seperator()
-                spacer("Bewertung: ".toSmallCaps())
+                spacer("Bewertung: ")
                 text(
                     PlaceholderAPI.setPlaceholders(
                         player,
                         "%plotsquared_currentplot_rating%"
-                    ).ifBlank { "/" }.toSmallCaps(),
+                    ).ifBlank { "/" },
                     Colors.WHITE
                 )
             }
         }
         .addEmptyLine()
+        .addLine(
+            text(
+                "Socials",
+                seperatorColor
+            ).decorate(TextDecoration.BOLD)
+        )
+        .addUpdatableLine {
+            buildText {
+                seperator()
+                spacer("Discord: ")
+                text("ꑏ/castcrafter", Colors.WHITE)
+            }
+        }
+        .addUpdatableLine {
+            buildText {
+                seperator()
+                spacer("Twitch: ")
+                text("ꑐ/castcrafter", Colors.WHITE)
+            }
+        }
+        .addUpdatableLine {
+            buildText {
+                seperator()
+                spacer("YouTube: ")
+                text("ꑑ/castcrafter", Colors.WHITE)
+            }
+        }
+        .addUpdatableLine {
+            buildText {
+                seperator()
+                spacer("Instagram: ")
+                text("ꑒ/castagram_", Colors.WHITE)
+            }
+        }
+        .addEmptyLine()
+        .addLine(
+            text(
+                "Server-Info",
+                seperatorColor
+            ).decorate(TextDecoration.BOLD)
+        )
+        .addUpdatableLine {
+            buildText {
+                seperator()
+                spacer("IP: ")
+                text("castcrafter.de", Colors.WHITE)
+            }
+        }
+        .addUpdatableLine {
+            buildText {
+                seperator()
+                spacer("Docs: ")
+                text("castcrafter.de/server", Colors.WHITE)
+            }
+        }
         .buildAutoUpdatable()
 
 private fun SurfComponentBuilder.seperator() = append(seperatorText.appendSpace())
