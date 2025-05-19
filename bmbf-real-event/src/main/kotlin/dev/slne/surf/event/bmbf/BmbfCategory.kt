@@ -48,6 +48,7 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
                         createConfigNode("plot.floor", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.GRAY_CONCRETE!!)
                         ),
                         createConfigNode("plot.bedrock", ConfigurationUtil.BOOLEAN, false),
+                        createConfigNode("plot.create_signs", ConfigurationUtil.BOOLEAN, false),
 
                         createConfigNode("wall.place_top_block", ConfigurationUtil.BOOLEAN, true),
                         createConfigNode("wall.block", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.WHITE_CONCRETE!!)
