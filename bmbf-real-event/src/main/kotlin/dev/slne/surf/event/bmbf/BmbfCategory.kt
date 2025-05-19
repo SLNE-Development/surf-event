@@ -44,48 +44,29 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
             settingsNodesWrapper(
                 SettingsNodesWrapper(
                     arrayOf(
-                        createConfigNode("plot.height", ConfigurationUtil.INTEGER, 62),
-                        createConfigNode("plot.size", ConfigurationUtil.INTEGER, 48),
-                        createConfigNode(
-                            "plot.filling",
-                            ConfigurationUtil.BLOCK_BUCKET,
-                            BlockBucket(BlockTypes.STONE!!)
+                        createConfigNode("plot.height", ConfigurationUtil.INTEGER, -1),
+                        createConfigNode("plot.size", ConfigurationUtil.INTEGER, 44),
+                        createConfigNode("plot.filling", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.AIR!!)
                         ),
+                        createConfigNode("plot.floor", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.GRAY_CONCRETE!!)
+                        ),
+                        createConfigNode("plot.bedrock", ConfigurationUtil.BOOLEAN, false),
+
                         createConfigNode("wall.place_top_block", ConfigurationUtil.BOOLEAN, true),
-                        createConfigNode(
-                            "plot.floor",
-                            ConfigurationUtil.BLOCK_BUCKET,
-                            BlockBucket(BlockTypes.GRASS_BLOCK!!)
+                        createConfigNode("wall.block", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.WHITE_CONCRETE!!)
                         ),
-                        createConfigNode(
-                            "wall.block",
-                            ConfigurationUtil.BLOCK_BUCKET,
-                            BlockBucket(BlockTypes.STONE_SLAB!!)
+                        createConfigNode("wall.block_claimed", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.RED_CONCRETE!!)
                         ),
-                        createConfigNode(
-                            "wall.block_claimed",
-                            ConfigurationUtil.BLOCK_BUCKET,
-                            BlockBucket(BlockTypes.SANDSTONE_SLAB!!)
+                        createConfigNode("wall.filling", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.AIR!!)
                         ),
+                        createConfigNode("wall.height", ConfigurationUtil.INTEGER, -2),
+
                         createConfigNode("road.width", ConfigurationUtil.INTEGER, 16),
-                        createConfigNode("road.height", ConfigurationUtil.INTEGER, 62),
-                        createConfigNode(
-                            "road.block",
-                            ConfigurationUtil.BLOCK_BUCKET,
-                            BlockBucket(BlockTypes.QUARTZ_BLOCK!!)
+                        createConfigNode("road.height", ConfigurationUtil.INTEGER, -1),
+                        createConfigNode("road.block", ConfigurationUtil.BLOCK_BUCKET, BlockBucket(BlockTypes.AIR!!)
                         ),
-                        createConfigNode(
-                            "wall.filling",
-                            ConfigurationUtil.BLOCK_BUCKET,
-                            BlockBucket(BlockTypes.STONE!!)
-                        ),
-                        createConfigNode("wall.height", ConfigurationUtil.INTEGER, 62),
-                        createConfigNode("plot.bedrock", ConfigurationUtil.BOOLEAN, true),
-                        createConfigNode(
-                            "world.component_below_bedrock",
-                            ConfigurationUtil.BOOLEAN,
-                            false
-                        )
+
+                        createConfigNode("world.component_below_bedrock", ConfigurationUtil.BOOLEAN, false)
                     ), null
                 )
             )
