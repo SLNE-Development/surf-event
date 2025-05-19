@@ -13,12 +13,9 @@ import com.sk89q.worldedit.world.block.BlockTypes
 import dev.slne.surf.surfapi.core.api.util.logger
 
 enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
-    FUSION_POWER_PLANT("Fusionskraftwerk", "fusion-power"),
-    DAM("Staudamm", "dam"),
+    HOUSE("Haus", "house"),
     JUMP_AND_RUN("Jump 'n' Run", "jump-and-run"),
-    SKYBLOCK_ISLAND("Skyblock-Insel", "skyblock"),
-    DOG("Hund", "dog"),
-    EIFFEL_TOWER("Eiffelturm", "eiffel-tower");
+    WATER_PARK("Wasserpark", "water-park");
 
     private val log = logger()
 
@@ -89,12 +86,9 @@ enum class BmbfCategory(val displayName: String, val plotAreaPrefix: String) {
 
     fun nextCategory(): BmbfCategory? {
         return when (this) {
-            FUSION_POWER_PLANT -> DAM
-            DAM -> JUMP_AND_RUN
-            JUMP_AND_RUN -> SKYBLOCK_ISLAND
-            SKYBLOCK_ISLAND -> DOG
-            DOG -> EIFFEL_TOWER
-            EIFFEL_TOWER -> null
+            HOUSE -> JUMP_AND_RUN
+            JUMP_AND_RUN -> WATER_PARK
+            WATER_PARK -> null
         }
     }
 

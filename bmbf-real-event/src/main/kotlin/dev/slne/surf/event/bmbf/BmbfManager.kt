@@ -31,7 +31,7 @@ object BmbfManager {
 
     var currentCategory: BmbfCategory = BmbfCategory.entries.first()
         private set
-    var currentChallenge: BmbfChallenge = BmbfChallenge.MINUTE_1
+    var currentChallenge: BmbfChallenge = BmbfChallenge.MINUTE_10
         private set
 
     fun selectNextCategory(category: BmbfCategory, challenge: BmbfChallenge) {
@@ -78,7 +78,7 @@ object BmbfManager {
                 currentChallenge = nextChallenge
             } else {
                 currentCategory = currentCategory.nextCategory() ?: return
-                currentChallenge = BmbfChallenge.MINUTE_1
+                currentChallenge = BmbfChallenge.MINUTE_10
             }
 
         }
@@ -189,7 +189,7 @@ object BmbfManager {
         running = false
         BmbfCountdownPlaceholder.current = Duration.ZERO
         currentCategory = BmbfCategory.entries.first()
-        currentChallenge = BmbfChallenge.MINUTE_1
+        currentChallenge = BmbfChallenge.MINUTE_10
         firstRun = true
     }
 

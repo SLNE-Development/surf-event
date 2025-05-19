@@ -17,7 +17,7 @@ fun CommandAPICommand.selectCommand() = subcommand("select") {
     withRequirement { !BmbfManager.running }
 
     multiLiteralArgument("category", *BmbfCategory.entries.map { it.toString().lowercase().replace("_", "-") }.toTypedArray())
-    multiLiteralArgument("challenge", "1", "10", "30")
+    multiLiteralArgument("challenge", "10", "60", "1440")
 
     anyExecutor { sender, args ->
         val category: String by args
@@ -26,9 +26,9 @@ fun CommandAPICommand.selectCommand() = subcommand("select") {
         val enumeratedCategory = category.replace("-", "_").uppercase()
         val parsedCategory = BmbfCategory.entries.first { it.name.equals(enumeratedCategory, true) }
         val parsedChallenge = when (challenge) {
-            "1" -> BmbfChallenge.MINUTE_1
             "10" -> BmbfChallenge.MINUTE_10
-            "30" -> BmbfChallenge.MINUTE_30
+            "60" -> BmbfChallenge.MINUTE_60
+            "1440" -> BmbfChallenge.MINUTE_1440
             else -> throw CommandAPI.failWithString("Invalid challenge: $challenge")
         }
 
