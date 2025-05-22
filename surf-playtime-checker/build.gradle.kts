@@ -20,5 +20,5 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.slne.surf.proxy:surf-proxy-api:1.21.4+")
+    compileOnly("dev.slne.surf.proxy:surf-proxy-api:1.21.4+")
 }
