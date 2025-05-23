@@ -16,13 +16,14 @@
           </compositeBuild>
         </compositeConfiguration>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="C:/Gradle/gradle-8.5" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../Gradle/gradle-8.5" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/surf-event-base" />
             <option value="$PROJECT_DIR$/surf-oneblock-skyblock-event" />
+            <option value="$PROJECT_DIR$/surf-playtime-checker" />
           </set>
         </option>
       </GradleProjectSettings>
