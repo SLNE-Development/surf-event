@@ -10,6 +10,7 @@ import dev.jorel.commandapi.kotlindsl.stringArgument
 import dev.jorel.commandapi.kotlindsl.subcommand
 import dev.slne.surf.event.playtimechecker.config.PlaytimeCheckerConfigManager
 import dev.slne.surf.event.playtimechecker.plugin
+import dev.slne.surf.proxy.api.ProxyApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun playtimeCheckerCommand() = commandAPICommand("playtimechecker") {
@@ -25,7 +26,7 @@ fun playtimeCheckerCommand() = commandAPICommand("playtimechecker") {
             })
         }
         stringArgument("category") {
-            includeSuggestions(ArgumentSuggestions.strings("survival", "creative", "skyblock"))
+            includeSuggestions(ArgumentSuggestions.strings(ProxyApi.PLAYTIME_CATEGORY))
         }
         longArgument("maxPlaytimeSeconds", 1L)
         anyExecutor { sender, args ->

@@ -7,8 +7,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import dev.slne.surf.event.playtimechecker.command.playtimeCheckerCommand
-import dev.slne.surf.event.playtimechecker.listener.PlayerConnectToServerListener
-import dev.slne.surf.event.playtimechecker.listener.PlaytimeUpdateListener
+import dev.slne.surf.event.playtimechecker.listener.PlayerPlaytimeListener
 import dev.slne.surf.proxy.api.event.SurfProxyEventManager
 import java.nio.file.Path
 
@@ -22,8 +21,8 @@ class VelocityMain @Inject constructor(@DataDirectory val datapath: Path, val pr
 
     @Subscribe(order = PostOrder.LATE)
     fun onProxyInitialize(unused: ProxyInitializeEvent) {
-        proxy.eventManager.register(this, PlayerConnectToServerListener)
-        SurfProxyEventManager.get().registerListener(PlaytimeUpdateListener)
+        proxy.eventManager.register(this, PlayerPlaytimeListener)
+        SurfProxyEventManager.get().registerListener(PlayerPlaytimeListener)
         playtimeCheckerCommand()
     }
 }
