@@ -1,6 +1,7 @@
-package dev.slne.surf.event.hardcore
+package dev.slne.surf.event.hardcore.papi
 
 import com.destroystokyo.paper.profile.PlayerProfile
+import dev.slne.surf.event.hardcore.PaperMain
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.bukkit.api.hook.papi.expansion.PapiPlaceholder
 import io.papermc.paper.ban.BanListType
@@ -14,7 +15,7 @@ class HardcoreDeathCountPlaceholder: PapiPlaceholder("death-count") {
     ): String? {
         return server.getBanList(BanListType.PROFILE)
             .getEntries<BanEntry<PlayerProfile>>()
-            .count { it.source == PaperMain.HARDCORE_BAN_SOURCE }
+            .count { it.source == PaperMain.Companion.HARDCORE_BAN_SOURCE }
             .toString()
     }
 }
