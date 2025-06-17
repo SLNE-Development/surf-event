@@ -17,7 +17,12 @@ object HardcoreListener : Listener {
         val player = event.player
         plugin.launch(player.dispatcher()) {
             if (player.hasPermission(HardcorePermissions.HARDCORE_BYPASS)) return@launch
-            player.ban<BanEntry<PlayerProfile>>("Game Over!", null as? Duration, "Hardcore", true)
+            player.ban<BanEntry<PlayerProfile>>(
+                "Game Over!",
+                null as? Duration,
+                PaperMain.HARDCORE_BAN_SOURCE,
+                true
+            )
 
             val location = player.location
             launch(location.dispatcher()) {
