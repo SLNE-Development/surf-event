@@ -32,7 +32,7 @@ object EndManager {
             val remainingDuration = remaining.seconds
 
             server.sendActionBar(buildText {
-                info("Das Ende beginnt in ")
+                info("Das große Finale beginnt in ")
                 variableValue(remainingDuration.toString())
             })
 
