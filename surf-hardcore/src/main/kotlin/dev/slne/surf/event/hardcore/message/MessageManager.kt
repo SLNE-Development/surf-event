@@ -41,7 +41,7 @@ object MessageManager {
         if (original == null) return
         val original = buildText {
             darkSpacer("[")
-            spacer("☠")
+            error("☠")
             darkSpacer("] ")
             append(original)
         }
