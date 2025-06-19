@@ -20,6 +20,21 @@ object MessageManager {
         error("Du kannst die Dimension während des finalen Events nicht wechseln!")
     }
 
+    val cannotPlaceEndCrystalBeforeEnd = buildText {
+        appendPrefix()
+        error("Du kannst den Endkristall nicht platzieren, bevor das Finale begonnen hat!")
+    }
+
+    val cannotPlaceBedsInOtherWorldsBeforeEnd = buildText {
+        appendPrefix()
+        error("Du kannst Betten in anderen Dimensionen nicht platzieren, bevor das Finale begonnen hat!")
+    }
+
+    val cannotPlaceRespawnAnchorBeforeEnd = buildText {
+        appendPrefix()
+        error("Du kannst den Respawn-Anker nicht platzieren, bevor das Finale begonnen hat!")
+    }
+
     fun broadcastDeathMessage(original: Component?, deathLocation: Location) {
         if (original == null) return
         val withTp = buildWithTp(original, deathLocation)
