@@ -58,12 +58,12 @@ class PaperMain : SuspendingJavaPlugin() {
                     launch {
                         val preEndDuration = args.getOrDefaultUnchecked(
                             "preEndDuration",
-                            Tick.tick().fromDuration(1.hours.toJavaDuration()).toLong()
-                        )
+                            Tick.tick().fromDuration(1.hours.toJavaDuration())
+                        ).toLong()
                         val shrinkDuration = args.getOrDefaultUnchecked(
                             "shrinkDuration",
-                            Tick.tick().fromDuration(30.minutes.toJavaDuration()).toLong()
-                        )
+                            Tick.tick().fromDuration(30.minutes.toJavaDuration())
+                        ).toLong()
 
                         EndManager.startEnd(
                             preEndDuration = Tick.of(preEndDuration).toKotlinDuration(),

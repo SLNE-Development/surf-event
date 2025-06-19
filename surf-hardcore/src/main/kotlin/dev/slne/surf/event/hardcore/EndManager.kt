@@ -27,6 +27,7 @@ object EndManager {
         isEnding = true
 
         while (remaining > 0) {
+            if (!isEnding) return
             remaining--
             val remainingDuration = remaining.seconds
 
@@ -36,7 +37,7 @@ object EndManager {
             })
 
             if (remainingDuration in 0.seconds..10.seconds
-                || remainingDuration == preEndDuration
+                || remainingDuration == preEndDuration - 5.seconds
                 || remainingDuration == 45.minutes
                 || remainingDuration == 30.minutes
                 || remainingDuration == 15.minutes
@@ -46,14 +47,27 @@ object EndManager {
                 server.sendText {
                     appendPrefix()
                     appendNewPrefixedLine()
+                    appendNewPrefixedLine()
                     info("Das große Finale beginnt in ")
                     variableValue(remainingDuration.toString())
                     appendNewPrefixedLine()
+                    appendNewPrefixedLine()
+                    appendNewPrefixedLine()
                     append {
-                        error("Verlasse jetzt den Nether und das End!")
+                        error("Verlasse ")
+                        if (remainingDuration > 1.minutes) {
+                            error("bald")
+                        } else {
+                            error("JETZT")
+                        }
+                        error(" den Nether und das End!")
+
                         decorate(TextDecoration.BOLD)
                     }
-                    error("Wer sich nach Ablauf der Zeit noch dort aufhält, scheidet automatisch aus!")
+                    appendNewPrefixedLine()
+                    error("Wer sich nach Ablauf der Zeit noch dort aufhält,")
+                    appendNewPrefixedLine()
+                    error("scheidet automatisch aus!")
                     appendNewPrefixedLine()
                 }
                 server.playSound {

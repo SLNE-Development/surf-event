@@ -46,7 +46,7 @@ object HardcoreListener : Listener {
 
     @EventHandler
     fun onPlayerTeleport(event: PlayerTeleportEvent) {
-        if (EndManager.isEnd) return
+        if (!EndManager.isEnd) return
         if (event.cause == PlayerTeleportEvent.TeleportCause.END_PORTAL || event.cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
             event.isCancelled = true
             event.player.sendMessage(MessageManager.cannotChangeDimensionDuringFinalEvent)
