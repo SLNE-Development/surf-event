@@ -7,7 +7,7 @@ import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.bukkit.api.util.dispatcher
 import kotlinx.coroutines.launch
 import org.bukkit.Material
-import org.bukkit.block.Bed
+import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.RespawnAnchor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -72,7 +72,7 @@ object HardcoreListener : Listener {
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (EndManager.isEnd) return
-        val block = event.blockPlaced
+        val block = event.blockPlaced.state
         val player = event.player
 
         when {
