@@ -30,4 +30,8 @@ object SoundManager {
     suspend fun getSoundState(player: Player) = withContext(player.dispatcher()) {
         getSoundStateUnsafe(player)
     }
+
+    suspend fun setSoundState(player: Player, state: Boolean) = withContext(player.dispatcher()) {
+        player.persistentDataContainer.set(key, PersistentDataType.BOOLEAN, state)
+    }
 }

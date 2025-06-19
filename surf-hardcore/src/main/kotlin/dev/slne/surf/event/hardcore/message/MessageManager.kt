@@ -4,6 +4,7 @@ import dev.slne.surf.event.hardcore.HardcorePermissions
 import dev.slne.surf.surfapi.bukkit.api.util.forEachPlayer
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickCallback
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -40,10 +41,12 @@ object MessageManager {
             hoverEvent(buildText {
                 info("Klicke, um zu teleportieren")
             })
-            clickEvent(ClickEvent.callback { clicker ->
+            clickEvent(ClickEvent.callback({ clicker ->
                 if (clicker !is Player) return@callback
                 clicker.teleportAsync(deathLocation)
-            })
+            }, { builder ->
+                builder.uses(ClickCallback.UNLIMITED_USES)
+            }))
         }
         append(original)
     }

@@ -6,11 +6,14 @@ import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandAPICommand
+import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.jorel.commandapi.kotlindsl.subcommand
 import dev.jorel.commandapi.kotlindsl.timeArgument
 import dev.slne.surf.event.hardcore.papi.HardcorePapiHook
+import dev.slne.surf.event.hardcore.sound.SoundManager
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import dev.slne.surf.surfapi.bukkit.api.hook.papi.papiHook
+import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import io.papermc.paper.util.Tick
 import kotlinx.coroutines.withContext
 import org.bukkit.BanEntry
@@ -38,7 +41,29 @@ class PaperMain : SuspendingJavaPlugin() {
         HardcoreListener.register()
         papiHook.register(HardcorePapiHook)
 
+        commandAPICommand("deathsound") {
+            withPermission(HardcorePermissions.HARDCORE_COMMAND)
+            playerExecutor { sender, _ ->
+                launch {
+                    val newState = !SoundManager.getSoundState(sender)
+                    SoundManager.setSoundState(sender, newState)
+                    sender.sendText {
+                        appendPrefix()
+                        info("Du hast den Zustand des Hardcore-Todesgeräuschs auf ")
+                        if (newState) {
+                            success("aktiviert")
+                        } else {
+                            error("deaktiviert")
+                        }
+                        info(" gesetzt.")
+                    }
+                }
+            }
+        }
+
         commandAPICommand("hardcore") {
+            withPermission(HardcorePermissions.HARDCORE_COMMAND)
+
             subcommand("cancelPreEnd") {
                 anyExecutor { sender, _ ->
                     if (EndManager.isEnding && !EndManager.isEnd) {
