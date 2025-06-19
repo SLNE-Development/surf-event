@@ -72,7 +72,7 @@ object HardcoreListener : Listener {
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (EndManager.isEnd) return
-        val block = event.blockPlaced.state
+        val block = event.blockPlaced.blockData
         val player = event.player
 
         when {
