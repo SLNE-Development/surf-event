@@ -9,6 +9,16 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 
 object MessageManager {
+    val nearbyPlayersWhenEmptyingLavaBucket = buildText {
+        appendPrefix()
+        error("Du kannst den Lava-Eimer nicht leeren, wenn sich andere Spieler in der Nähe befinden!")
+    }
+
+    val cannotChangeDimensionDuringFinalEvent = buildText {
+        appendPrefix()
+        error("Du kannst die Dimension während des finalen Events nicht wechseln!")
+    }
+
     fun broadcastDeathMessage(original: Component?, deathLocation: Location) {
         if (original == null) return
         val withTp = buildWithTp(original, deathLocation)

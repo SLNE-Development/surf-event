@@ -1,17 +1,17 @@
 package dev.slne.surf.event.hardcore
 
-import com.destroystokyo.paper.profile.PlayerProfile
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.event.hardcore.message.MessageManager
 import dev.slne.surf.event.hardcore.sound.SoundManager
 import dev.slne.surf.surfapi.bukkit.api.util.dispatcher
 import kotlinx.coroutines.launch
-import org.bukkit.BanEntry
+import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
-import java.time.Duration
+import org.bukkit.event.player.PlayerBucketEmptyEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 
 object HardcoreListener : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -28,15 +28,28 @@ object HardcoreListener : Listener {
                 SoundManager.broadcastDeathSound()
                 MessageManager.broadcastDeathMessage(event.deathMessage(), location)
             } finally {
-                if (!player.hasPermission(HardcorePermissions.HARDCORE_BYPASS)) {
-                    player.ban<BanEntry<PlayerProfile>>(
-                        "Game Over!",
-                        null as? Duration,
-                        PaperMain.HARDCORE_BAN_SOURCE,
-                        true
-                    )
-                }
+                plugin.tryBanPlayer(player)
             }
+        }
+    }
+
+    @EventHandler
+    fun onPlayerBucketEmpty(event: PlayerBucketEmptyEvent) {
+        if (EndManager.isEnd) return
+        if (event.bucket != Material.LAVA_BUCKET) return
+        val player = event.player
+        val otherPlayers = player.location.getNearbyPlayers(10.0) { it != player }
+        if (otherPlayers.isEmpty()) return
+        event.isCancelled = true
+        player.sendMessage(MessageManager.nearbyPlayersWhenEmptyingLavaBucket)
+    }
+
+    @EventHandler
+    fun onPlayerTeleport(event: PlayerTeleportEvent) {
+        if (EndManager.isEnd) return
+        if (event.cause == PlayerTeleportEvent.TeleportCause.END_PORTAL || event.cause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
+            event.isCancelled = true
+            event.player.sendMessage(MessageManager.cannotChangeDimensionDuringFinalEvent)
         }
     }
 }
