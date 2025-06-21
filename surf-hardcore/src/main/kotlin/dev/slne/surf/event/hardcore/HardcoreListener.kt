@@ -1,6 +1,7 @@
 package dev.slne.surf.event.hardcore
 
 import com.github.shynixn.mccoroutine.folia.launch
+import dev.slne.surf.event.hardcore.config.HardcoreConfigHolder
 import dev.slne.surf.event.hardcore.message.MessageManager
 import dev.slne.surf.event.hardcore.sound.SoundManager
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
@@ -43,7 +44,8 @@ object HardcoreListener : Listener {
         if (EndManager.isEnd) return
         if (event.bucket != Material.LAVA_BUCKET) return
         val player = event.player
-        val otherPlayers = player.location.getNearbyPlayers(10.0) { it != player }
+        val otherPlayers =
+            player.location.getNearbyPlayers(HardcoreConfigHolder.config.lavaCheckRadius) { it != player }
         if (otherPlayers.isEmpty()) return
         event.isCancelled = true
         player.sendMessage(MessageManager.nearbyPlayersWhenEmptyingLavaBucket)

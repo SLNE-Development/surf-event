@@ -9,6 +9,7 @@ import dev.jorel.commandapi.kotlindsl.commandAPICommand
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.jorel.commandapi.kotlindsl.subcommand
 import dev.jorel.commandapi.kotlindsl.timeArgument
+import dev.slne.surf.event.hardcore.config.HardcoreConfigHolder
 import dev.slne.surf.event.hardcore.papi.HardcorePapiHook
 import dev.slne.surf.event.hardcore.sound.SoundManager
 import dev.slne.surf.surfapi.bukkit.api.event.register
@@ -63,6 +64,16 @@ class PaperMain : SuspendingJavaPlugin() {
 
         commandAPICommand("hardcore") {
             withPermission(HardcorePermissions.HARDCORE_COMMAND)
+
+            subcommand("reload") {
+                anyExecutor { sender, _ ->
+                    HardcoreConfigHolder.reload()
+                    sender.sendText {
+                        appendPrefix()
+                        success("Die Hardcore-Konfiguration wurde neu geladen.")
+                    }
+                }
+            }
 
             subcommand("cancelPreEnd") {
                 anyExecutor { sender, _ ->

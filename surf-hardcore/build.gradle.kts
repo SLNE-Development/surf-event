@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "dev.slne.surf.event"
-version = "1.0.0"
+version = "1.0.1"
 
 surfPaperPluginApi {
     mainClass("dev.slne.surf.event.hardcore.PaperMain")

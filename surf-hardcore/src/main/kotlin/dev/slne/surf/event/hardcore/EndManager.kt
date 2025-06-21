@@ -1,13 +1,13 @@
 package dev.slne.surf.event.hardcore
 
 import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
+import dev.slne.surf.event.hardcore.config.HardcoreConfigHolder
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.playSound
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import net.kyori.adventure.sound.Sound.Source
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Sound
 import org.bukkit.World
@@ -110,7 +110,10 @@ object EndManager {
 
             val overworld = server.worlds.first()
             with(overworld.worldBorder) {
-                setSize(10.0, shrinkDuration.inWholeSeconds)
+                setSize(
+                    HardcoreConfigHolder.config.endWorldborderSideLength,
+                    shrinkDuration.inWholeSeconds
+                )
             }
         }
     }
