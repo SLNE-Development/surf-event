@@ -34,6 +34,7 @@ class PaperMain : SuspendingJavaPlugin() {
     }
 
     override suspend fun onEnableAsync() {
+        HardcoreConfigHolder
         withContext(globalRegionDispatcher) {
             for (world in server.worlds) {
                 world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false)
