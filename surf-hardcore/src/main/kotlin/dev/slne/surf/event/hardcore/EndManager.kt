@@ -110,7 +110,7 @@ object EndManager {
 
             val overworld = server.worlds.first()
             with(overworld.worldBorder) {
-                setSize(10.0, shrinkDuration.inWholeSeconds)
+                setSize(100.0, shrinkDuration.inWholeSeconds)
             }
         }
     }
