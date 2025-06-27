@@ -24,6 +24,7 @@
             <option value="$PROJECT_DIR$/surf-event-base" />
             <option value="$PROJECT_DIR$/surf-oneblock-skyblock-event" />
             <option value="$PROJECT_DIR$/surf-playtime-checker" />
+            <option value="$PROJECT_DIR$/surf-radnom-drops-event" />
           </set>
         </option>
       </GradleProjectSettings>
