@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
 
 object PlayerDataStorage {
-    private const val FLUSH_THRESHOLD = 1000
+    private const val FLUSH_THRESHOLD = 5000
 
     private val blockDrops = mutableObject2ObjectMapOf<UUID, Object2ObjectMap<Key, Key>>()
     private val mobDrops =
@@ -37,33 +37,24 @@ object PlayerDataStorage {
         ConcurrentHashMap.newKeySet<Triple<UUID, EntityType, EntityType>>()
     val dirtyCounter = AtomicInteger(0)
 
-    fun getOrCreateReplacedBlockDrop(uuid: UUID, original: Key): Key {
-        val replacedDrops = blockDrops.computeIfAbsent(uuid) { mutableObject2ObjectMapOf() }
-        return replacedDrops.computeIfAbsent(original) {
-            RandomDropSelector.selectRandomBlockDrop().key().also {
-                bufferBlockChange(uuid, original, it)
-            }
-        }
-    }
+    fun getOrCreateReplacedBlockDrop(uuid: UUID, original: Key): Key = blockDrops
+        .computeIfAbsent(uuid) { mutableObject2ObjectMapOf() }
+        .getOrCreateUnique(
+            original,
+            { RandomDropSelector.selectRandomBlockDrop().key() },
+            uuid,
+            ::bufferBlockChange
+        )
 
-    fun getOrCreateReplacedMobType(uuid: UUID, original: EntityType): EntityType {
-        val replacements = mobDrops.computeIfAbsent(uuid) { mutableObject2ObjectMapOf() }
-        return replacements[original] ?: run {
-            repeat(10) {
-                val candidate = RandomDropSelector.selectRandomEntityType()
-                if (replacements.containsValue(candidate)) {
-                    return@repeat
-                }
-                replacements[original] = candidate
-                bufferMobChange(uuid, original, candidate)
-                return candidate
-            }
-            RandomDropSelector.selectRandomEntityType().also {
-                replacements[original] = it
-                bufferMobChange(uuid, original, it)
-            }
-        }
-    }
+
+    fun getOrCreateReplacedMobType(uuid: UUID, original: EntityType): EntityType = mobDrops
+        .computeIfAbsent(uuid) { mutableObject2ObjectMapOf() }
+        .getOrCreateUnique(
+            original,
+            { RandomDropSelector.selectRandomEntityType() },
+            uuid,
+            ::bufferMobChange
+        )
 
     suspend fun loadCache(uuid: UUID) {
         newSuspendedTransaction(Dispatchers.IO) {
@@ -162,5 +153,21 @@ object PlayerDataStorage {
         }
 
         if (dirtyCounter.get() >= FLUSH_THRESHOLD) scheduleFlush()
+    }
+
+    private inline fun <K, V> Object2ObjectMap<K, V>.getOrCreateUnique(
+        key: K,
+        provider: () -> V,
+        uuid: UUID,
+        bufferChange: (UUID, K, V) -> Unit,
+        tries: Int = 10
+    ): V = getOrPut(key) {
+        var attempts = 0
+        var candidate = provider()
+        while (containsValue(candidate) && attempts++ < tries) {
+            candidate = provider()
+        }
+        bufferChange(uuid, key, candidate)
+        candidate
     }
 }

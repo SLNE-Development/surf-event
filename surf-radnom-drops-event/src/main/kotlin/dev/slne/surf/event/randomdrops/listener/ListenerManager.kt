@@ -1,6 +1,7 @@
 package dev.slne.surf.event.randomdrops.listener
 
 import dev.slne.surf.event.randomdrops.listener.random.RandomBlockDropListener
+import dev.slne.surf.event.randomdrops.listener.random.RandomLootTable
 import dev.slne.surf.event.randomdrops.listener.random.RandomMobDropListener
 import dev.slne.surf.event.randomdrops.listener.save.PlayerDataSaveListener
 import dev.slne.surf.surfapi.bukkit.api.event.register
@@ -10,5 +11,6 @@ object ListenerManager {
         RandomBlockDropListener.register()
         RandomMobDropListener.register()
         PlayerDataSaveListener.register()
+        RandomLootTable.register()
     }
 }

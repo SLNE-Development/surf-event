@@ -1,5 +1,6 @@
 package dev.slne.surf.event.randomdrops.random
 
+import dev.slne.surf.event.randomdrops.config.config
 import dev.slne.surf.event.randomdrops.util.lootTable
 import dev.slne.surf.surfapi.core.api.util.random
 import dev.slne.surf.surfapi.core.api.util.toObjectList
@@ -11,7 +12,10 @@ import kotlin.random.asKotlinRandom
 
 object RandomDropSelector {
 
-    private val blockDrops = Registry.ITEM.toObjectList()
+    private val blockDrops = Registry.ITEM
+        .filter { it !in config.randomBlockDropFilter }
+        .toObjectList()
+
     private val entityTypes = EntityType.entries
         .filter { type -> type.entityClass?.let { Damageable::class.java.isAssignableFrom(it) } == true }
         .filter { it.lootTable() != null }
