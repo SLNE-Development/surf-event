@@ -36,27 +36,12 @@ object PlayerDropService {
         )
 
         val lootTable = replacedType.lootTableOrThrow()
-        val tempEntity = entity.world.spawnEntity(
-            Location.BLOCK_ZERO.toLocation(entity.world),
-            replacedType,
-            CreatureSpawnEvent.SpawnReason.CUSTOM
-        ) { temp ->
-            with(temp) {
-                isInvulnerable = true
-                isSilent = true
-                isPersistent = false
-            }
-        }
-
         val context = LootContext.Builder(entity.location)
             .luck(player.getAttribute(Attribute.LUCK)?.value?.toFloat() ?: 0.0f)
             .killer(player)
-            .lootedEntity(tempEntity)
+            .lootedEntity(entity)
             .build()
 
-        val drops = lootTable.lootTable.populateLoot(null, context)
-        tempEntity.remove()
-
-        return drops
+        return lootTable.lootTable.populateLoot(null, context)
     }
 }
