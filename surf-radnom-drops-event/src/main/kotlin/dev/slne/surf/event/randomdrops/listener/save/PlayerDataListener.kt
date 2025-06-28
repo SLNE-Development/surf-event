@@ -5,7 +5,6 @@ import dev.slne.surf.event.randomdrops.data.PlayerDataStorage
 import dev.slne.surf.event.randomdrops.plugin
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.core.api.messages.CommonComponents
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import dev.slne.surf.surfapi.core.api.util.logger
 import kotlinx.coroutines.runBlocking
@@ -16,7 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.world.WorldSaveEvent
 import kotlin.system.measureTimeMillis
 
-object PlayerDataSaveListener : Listener {
+object PlayerDataListener : Listener {
 
     private val log = logger()
 
