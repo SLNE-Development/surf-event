@@ -23,9 +23,10 @@ object PlayerDataListener : Listener {
     fun onWorldSave(event: WorldSaveEvent) {
         if (event.world != server.worlds.first()) return
         plugin.launch {
+            val dirty = PlayerDataStorage.dirtyCounter.get()
             val ms = measureTimeMillis { PlayerDataStorage.flush() }
             log.atInfo()
-                .log("Player data flushed in $ms ms, dirty changes: ${PlayerDataStorage.dirtyCounter.get()}")
+                .log("Player data flushed in $ms ms, dirty changes: $dirty")
         }
     }
 
