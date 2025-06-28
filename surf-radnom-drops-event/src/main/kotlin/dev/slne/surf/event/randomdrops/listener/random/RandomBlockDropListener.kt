@@ -29,7 +29,7 @@ object RandomBlockDropListener : Listener {
 
         for (drop in items) {
             val dropItem = drop.itemStack
-            val originalType = dropItem.type.asItemType() ?: return
+            val originalType = dropItem.type.asItemType() ?: continue
             val replacedType = PlayerDropService.getReplacedBlockDrop(uuid, originalType)
             drop.itemStack = replacedType.createItemStack(dropItem.amount)
         }
@@ -37,44 +37,32 @@ object RandomBlockDropListener : Listener {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        val block = event.block.state
-        if (block is InventoryHolder) {
-            val inventory = block.inventory
-            val content = inventory.contents
-            inventory.clear()
-
-            for (content in content) {
-                if (content == null) continue
-                block.world.dropItemNaturally(block.location, content)
-            }
-        }
+        val block = event.block
+        val holder = block.state as? InventoryHolder ?: return
+        holder.inventory.storageContents
+            .filterNotNull()
+            .forEach { block.world.dropItemNaturally(block.location, it) }
+        holder.inventory.clear()
     }
 
     @EventHandler
     fun onBlockDestroy(event: BlockDestroyEvent) {
-        val blockSourceCheck = when (event.block.type) {
-            Material.CHORUS_PLANT -> listOf(
-                BlockFace.DOWN,
-                BlockFace.NORTH,
-                BlockFace.SOUTH,
-                BlockFace.EAST,
-                BlockFace.WEST
-            )
-
-            else -> listOf(BlockFace.DOWN)
+        val sourceFaces = when (event.block.type) {
+            Material.CHORUS_PLANT -> CHORUS_CHECK
+            else -> DOWN_ONLY
         }
 
-        val sourcePlayer = blockSourceCheck
-            .map { event.block.getRelative(it) }
-            .map { breakSource.getIfPresent(it.location) }
-            .firstOrNull { it != null } ?: return
+        val sourcePlayer = sourceFaces.asSequence()
+            .map { event.block.getRelative(it).location }
+            .mapNotNull { breakSource.getIfPresent(it) }
+            .firstOrNull() ?: return
 
         event.setWillDrop(false)
-        val drops = event.block.getDrops(sourcePlayer.inventory.itemInMainHand, sourcePlayer)
         breakSource.put(event.block.location, sourcePlayer)
 
+        val drops = event.block.getDrops(sourcePlayer.inventory.itemInMainHand, sourcePlayer)
         for (drop in drops) {
-            val originalType = drop.type.asItemType() ?: return
+            val originalType = drop.type.asItemType() ?: continue
             val replacedType =
                 PlayerDropService.getReplacedBlockDrop(sourcePlayer.uniqueId, originalType)
 
@@ -84,4 +72,9 @@ object RandomBlockDropListener : Listener {
             )
         }
     }
+
+    private val DOWN_ONLY = arrayOf(BlockFace.DOWN)
+    private val CHORUS_CHECK = arrayOf(
+        BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST
+    )
 }

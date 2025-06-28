@@ -1,16 +1,16 @@
 package dev.slne.surf.event.randomdrops.data
 
-import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.event.randomdrops.db.entities.BlockDropEntity
 import dev.slne.surf.event.randomdrops.db.entities.MobDropEntity
 import dev.slne.surf.event.randomdrops.db.tables.PlayerBlockDropsTable
 import dev.slne.surf.event.randomdrops.db.tables.PlayerMobDropsTable
-import dev.slne.surf.event.randomdrops.plugin
 import dev.slne.surf.event.randomdrops.random.RandomDropSelector
 import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
 import dev.slne.surf.surfapi.core.api.util.mutableObjectListOf
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.actor
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.EntityType
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -18,9 +18,7 @@ import org.jetbrains.exposed.sql.batchUpsert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.locks.ReentrantLock
 
 object PlayerDataStorage {
     private const val FLUSH_THRESHOLD = 5000
@@ -29,13 +27,14 @@ object PlayerDataStorage {
     private val mobDrops =
         mutableObject2ObjectMapOf<UUID, Object2ObjectMap<EntityType, EntityType>>()
 
-    private val flushLock = ReentrantLock()
-    private val flushScheduled = AtomicBoolean(false)
-
     private val pendingBlockChanges = ConcurrentHashMap.newKeySet<Triple<UUID, Key, Key>>()
     private val pendingMobChanges =
         ConcurrentHashMap.newKeySet<Triple<UUID, EntityType, EntityType>>()
     val dirtyCounter = AtomicInteger(0)
+
+    private val flusher = CoroutineScope(Dispatchers.IO).actor<Unit>(capacity = 1) {
+        for (m in channel) flush()
+    }
 
     fun getOrCreateReplacedBlockDrop(uuid: UUID, original: Key): Key = blockDrops
         .computeIfAbsent(uuid) { mutableObject2ObjectMapOf() }
@@ -70,7 +69,7 @@ object PlayerDataStorage {
     }
 
     suspend fun destroyCache(uuid: UUID) {
-        flush(playerFilter = uuid)
+        flush(uuid)
         blockDrops.remove(uuid)
         mobDrops.remove(uuid)
     }
@@ -81,78 +80,60 @@ object PlayerDataStorage {
 
 
     private fun bufferBlockChange(uuid: UUID, original: Key, replaced: Key) {
-        pendingBlockChanges.add(Triple(uuid, original, replaced))
-        markDirty()
+        pendingBlockChanges += Triple(uuid, original, replaced)
+        scheduleFlushIfNeeded()
     }
 
     private fun bufferMobChange(uuid: UUID, original: EntityType, replaced: EntityType) {
-        pendingMobChanges.add(Triple(uuid, original, replaced))
-        markDirty()
+        pendingMobChanges += Triple(uuid, original, replaced)
+        scheduleFlushIfNeeded()
     }
 
-
-    private fun markDirty() {
-        if (dirtyCounter.incrementAndGet() > FLUSH_THRESHOLD) {
-            scheduleFlush()
-        }
-    }
-
-    private fun scheduleFlush() {
-        if (flushScheduled.compareAndSet(false, true)) {
-            plugin.launch {
-                try {
-                    flush()
-                } finally {
-                    flushScheduled.set(false)
-                }
-            }
+    private fun scheduleFlushIfNeeded() {
+        if (pendingBlockChanges.size + pendingMobChanges.size >= FLUSH_THRESHOLD) {
+            flusher.trySend(Unit)
         }
     }
 
     suspend fun flush(playerFilter: UUID? = null) {
-        if (!flushLock.tryLock()) return
-        try {
-            val blocksToSave = mutableObjectListOf<Triple<UUID, Key, Key>>()
-            val mobsToSave = mutableObjectListOf<Triple<UUID, EntityType, EntityType>>()
+        val blocksToSave = mutableObjectListOf<Triple<UUID, Key, Key>>()
+        val mobsToSave = mutableObjectListOf<Triple<UUID, EntityType, EntityType>>()
 
-            pendingBlockChanges.removeIf { triple ->
-                if (playerFilter == null || triple.first == playerFilter) {
-                    blocksToSave += triple
-                    true
-                } else false
-            }
-            pendingMobChanges.removeIf { triple ->
-                if (playerFilter == null || triple.first == playerFilter) {
-                    mobsToSave += triple
-                    true
-                } else false
-            }
-            dirtyCounter.addAndGet(-(blocksToSave.size + mobsToSave.size))
-            if (blocksToSave.isEmpty() && mobsToSave.isEmpty()) return
+        pendingBlockChanges.removeIf { triple ->
+            if (playerFilter == null || triple.first == playerFilter) {
+                blocksToSave += triple
+                true
+            } else false
+        }
+        pendingMobChanges.removeIf { triple ->
+            if (playerFilter == null || triple.first == playerFilter) {
+                mobsToSave += triple
+                true
+            } else false
+        }
+        dirtyCounter.addAndGet(-(blocksToSave.size + mobsToSave.size))
+        if (blocksToSave.isEmpty() && mobsToSave.isEmpty()) return
 
-            newSuspendedTransaction(Dispatchers.IO) {
-                PlayerBlockDropsTable.batchUpsert(
-                    blocksToSave,
-                    shouldReturnGeneratedValues = false
-                ) { (uuid, original, replaced) ->
-                    this[PlayerBlockDropsTable.uuid] = uuid
-                    this[PlayerBlockDropsTable.originalKey] = original
-                    this[PlayerBlockDropsTable.replacedKey] = replaced
-                }
-                PlayerMobDropsTable.batchUpsert(
-                    mobsToSave,
-                    shouldReturnGeneratedValues = false
-                ) { (uuid, original, replaced) ->
-                    this[PlayerMobDropsTable.uuid] = uuid
-                    this[PlayerMobDropsTable.originalType] = original
-                    this[PlayerMobDropsTable.replacedType] = replaced
-                }
+        newSuspendedTransaction(Dispatchers.IO) {
+            PlayerBlockDropsTable.batchUpsert(
+                blocksToSave,
+                shouldReturnGeneratedValues = false
+            ) { (uuid, original, replaced) ->
+                this[PlayerBlockDropsTable.uuid] = uuid
+                this[PlayerBlockDropsTable.originalKey] = original
+                this[PlayerBlockDropsTable.replacedKey] = replaced
             }
-        } finally {
-            flushLock.unlock()
+            PlayerMobDropsTable.batchUpsert(
+                mobsToSave,
+                shouldReturnGeneratedValues = false
+            ) { (uuid, original, replaced) ->
+                this[PlayerMobDropsTable.uuid] = uuid
+                this[PlayerMobDropsTable.originalType] = original
+                this[PlayerMobDropsTable.replacedType] = replaced
+            }
         }
 
-        if (dirtyCounter.get() >= FLUSH_THRESHOLD) scheduleFlush()
+        scheduleFlushIfNeeded()
     }
 
     private inline fun <K, V> Object2ObjectMap<K, V>.getOrCreateUnique(

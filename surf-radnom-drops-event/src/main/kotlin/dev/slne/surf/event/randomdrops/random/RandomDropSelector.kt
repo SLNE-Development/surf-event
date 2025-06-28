@@ -14,14 +14,14 @@ import kotlin.random.asKotlinRandom
 object RandomDropSelector {
 
     @Suppress("DEPRECATION")
-    private val blockDrops = Registry.ITEM
-        .filter { it !in config.randomBlockDropFilter }
-        .filterNot {
-            it.asMaterial()?.let { material -> MaterialTags.SPAWN_EGGS.isTagged(material) } == true
+    private val blockDrops = Registry.ITEM.asSequence()
+        .filterNot { it in config.randomBlockDropFilter }
+        .filterNot { type ->
+            type.asMaterial()?.let { MaterialTags.SPAWN_EGGS.isTagged(it) } == true
         }
         .toObjectList()
 
-    private val entityTypes = EntityType.entries
+    private val entityTypes = EntityType.entries.asSequence()
         .filter { type -> type.entityClass?.let { Damageable::class.java.isAssignableFrom(it) } == true }
         .filter { it.lootTable() != null }
         .filter { it.isSpawnable }

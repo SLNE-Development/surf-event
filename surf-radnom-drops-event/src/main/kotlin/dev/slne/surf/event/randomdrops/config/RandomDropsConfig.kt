@@ -3,6 +3,7 @@ package dev.slne.surf.event.randomdrops.config
 import dev.slne.surf.event.randomdrops.plugin
 import dev.slne.surf.surfapi.core.api.config.createSpongeYmlConfig
 import dev.slne.surf.surfapi.core.api.config.surfConfigApi
+import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -21,12 +22,8 @@ data class RandomDropsConfig(
     val randomBlockDropFilterRaw: List<String>
 ) {
     val randomBlockDropFilter by lazy {
-        randomBlockDropFilterRaw.mapNotNull {
-            Registry.ITEM.get(
-                Key.key(
-                    it
-                )
-            )
-        }
+        randomBlockDropFilterRaw.mapNotNull { raw ->
+            Registry.ITEM.get(Key.key(raw))
+        }.toObjectSet()
     }
 }
