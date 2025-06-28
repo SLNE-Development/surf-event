@@ -1,5 +1,6 @@
 package dev.slne.surf.event.randomdrops.random
 
+import com.destroystokyo.paper.MaterialTags
 import dev.slne.surf.event.randomdrops.config.config
 import dev.slne.surf.event.randomdrops.util.lootTable
 import dev.slne.surf.surfapi.core.api.util.random
@@ -12,8 +13,12 @@ import kotlin.random.asKotlinRandom
 
 object RandomDropSelector {
 
+    @Suppress("DEPRECATION")
     private val blockDrops = Registry.ITEM
         .filter { it !in config.randomBlockDropFilter }
+        .filterNot {
+            it.asMaterial()?.let { material -> MaterialTags.SPAWN_EGGS.isTagged(material) } == true
+        }
         .toObjectList()
 
     private val entityTypes = EntityType.entries
