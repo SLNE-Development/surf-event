@@ -3,10 +3,7 @@ package dev.slne.surf.event.randomdrops.random
 import com.destroystokyo.paper.MaterialTags
 import dev.slne.surf.event.randomdrops.config.config
 import dev.slne.surf.event.randomdrops.util.lootTable
-import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
-import dev.slne.surf.surfapi.core.api.util.mutableObjectListOf
-import dev.slne.surf.surfapi.core.api.util.random
-import dev.slne.surf.surfapi.core.api.util.toObjectList
+import dev.slne.surf.surfapi.core.api.util.*
 import it.unimi.dsi.fastutil.objects.ObjectList
 import org.bukkit.Registry
 import org.bukkit.entity.Damageable
@@ -31,6 +28,7 @@ object RandomDropSelector {
         .filter { type -> type.entityClass?.let { Damageable::class.java.isAssignableFrom(it) } == true }
         .filter { it.lootTable() != null }
         .filter { it.isSpawnable }
+        .filter { it !in objectSetOf(EntityType.PILLAGER, EntityType.SHEEP, EntityType.SLIME) }
         .toObjectList()
 
 

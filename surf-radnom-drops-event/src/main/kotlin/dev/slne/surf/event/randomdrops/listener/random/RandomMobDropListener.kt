@@ -14,7 +14,7 @@ object RandomMobDropListener : Listener {
         val entity = event.entity
         with(event.drops) {
             clear()
-            addAll(PlayerDropService.getReplacedMobDrops(killer, entity))
+            addAll(PlayerDropService.getReplacedMobDrops(killer, entity, event.damageSource))
         }
     }
 }
