@@ -30,7 +30,6 @@ object PlayerDataStorage {
     private val pendingBlockChanges = ConcurrentHashMap.newKeySet<Triple<UUID, Key, Key>>()
     private val pendingMobChanges =
         ConcurrentHashMap.newKeySet<Triple<UUID, EntityType, EntityType>>()
-    val dirtyCounter = AtomicInteger(0)
 
     private val flusher = CoroutineScope(Dispatchers.IO).actor<Unit>(capacity = 1) {
         for (m in channel) flush()
@@ -111,7 +110,6 @@ object PlayerDataStorage {
                 true
             } else false
         }
-        dirtyCounter.addAndGet(-(blocksToSave.size + mobsToSave.size))
         if (blocksToSave.isEmpty() && mobsToSave.isEmpty()) return
 
         newSuspendedTransaction(Dispatchers.IO) {
