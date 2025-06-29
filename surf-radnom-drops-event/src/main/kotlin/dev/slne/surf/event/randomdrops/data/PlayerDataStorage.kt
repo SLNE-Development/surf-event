@@ -18,7 +18,6 @@ import org.jetbrains.exposed.sql.batchUpsert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 
 object PlayerDataStorage {
     private const val FLUSH_THRESHOLD = 5000
