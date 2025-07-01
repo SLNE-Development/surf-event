@@ -8,3 +8,4 @@ include("surf-event-base")
 include("surf-oneblock-skyblock-event")
 
 include("surf-playtime-checker")
+include("surf-event-base-new")
