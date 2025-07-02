@@ -7,5 +7,6 @@ rootProject.name = "surf-event"
 include("surf-event-base")
 include("surf-oneblock-skyblock-event")
 include("surf-mythic-mobs-hook")
-
+include("surf-hardcore")
+include("bmbf-real-event")
 include("surf-playtime-checker")
