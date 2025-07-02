@@ -15,6 +15,8 @@ import kotlin.jvm.optionals.getOrNull
 
 object PlayerPlaytimeListener : SurfProxyEventListener<SurfProxyPrePlaytimeUpdateEvent> {
 
+    private const val BYPASS_PERMISSION = "surf.event.playtimechecker.bypass"
+
     private val kickMessage = buildText {
         appendKickDisconnectMessage({
             variableValue("Du hast die maximale Spielzeit auf")
@@ -32,6 +34,8 @@ object PlayerPlaytimeListener : SurfProxyEventListener<SurfProxyPrePlaytimeUpdat
         val player = plugin.proxy.getPlayer(event.user.uuid).getOrNull() ?: return
         val serverName = player.currentServer.getOrNull()?.serverInfo?.name ?: return
 
+        if (player.hasPermission(BYPASS_PERMISSION)) return
+
         if (!serverName.isAllowed(event.newPlaytime.playtime)) {
             player.disconnect(kickMessage)
         }
@@ -39,6 +43,8 @@ object PlayerPlaytimeListener : SurfProxyEventListener<SurfProxyPrePlaytimeUpdat
 
     @Subscribe
     fun onServerPreConnect(event: ServerPreConnectEvent) = with(event) {
+        if (player.hasPermission(BYPASS_PERMISSION)) return
+
         val serverName = result.server.getOrNull()?.serverInfo?.name ?: return
         if (!serverName.isAllowed(player.uniqueId)) {
             result = ServerPreConnectEvent.ServerResult.denied()
@@ -48,6 +54,8 @@ object PlayerPlaytimeListener : SurfProxyEventListener<SurfProxyPrePlaytimeUpdat
 
     @Subscribe(order = PostOrder.LAST)
     fun onPlayerChooseInitialServer(event: PlayerChooseInitialServerEvent) = with(event) {
+        if (player.hasPermission(BYPASS_PERMISSION)) return
+
         val serverName = initialServer.getOrNull()?.serverInfo?.name ?: return
         if (!serverName.isAllowed(player.uniqueId)) {
             player.disconnect(kickMessage)
