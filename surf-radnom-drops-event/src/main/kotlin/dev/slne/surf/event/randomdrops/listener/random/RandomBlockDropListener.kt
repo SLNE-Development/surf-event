@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.block.BlockDestroyEvent
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.sksamuel.aedile.core.expireAfterWrite
 import dev.slne.surf.event.randomdrops.service.PlayerDropService
+import io.papermc.paper.event.block.PlayerShearBlockEvent
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -16,6 +17,8 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDropItemEvent
+import org.bukkit.event.player.PlayerHarvestBlockEvent
+import org.bukkit.event.player.PlayerShearEntityEvent
 import org.bukkit.inventory.InventoryHolder
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
@@ -96,6 +99,33 @@ object RandomBlockDropListener : Listener {
             originalStack.type.asItemType() ?: return
         ).createItemStack(originalStack.amount)
     }
+
+    @EventHandler
+    fun onPlayerShearBlock(event: PlayerShearBlockEvent) {
+        PlayerDropService.replaceBlockDrops(
+            event.player.uniqueId,
+            event.drops.listIterator()
+        )
+    }
+
+    @EventHandler
+    fun onPlayerShearEntity(event: PlayerShearEntityEvent) {
+        val drops = event.drops.toMutableList()
+        PlayerDropService.replaceBlockDrops(
+            event.player.uniqueId,
+            drops.listIterator()
+        )
+        event.drops = drops
+    }
+
+    @EventHandler
+    fun onPlayerHarvestBlock(event: PlayerHarvestBlockEvent) {
+        PlayerDropService.replaceBlockDrops(
+            event.player.uniqueId,
+            event.itemsHarvested.listIterator()
+        )
+    }
+
 
     private val DOWN_ONLY = arrayOf(BlockFace.DOWN)
     private val CHORUS_CHECK = arrayOf(

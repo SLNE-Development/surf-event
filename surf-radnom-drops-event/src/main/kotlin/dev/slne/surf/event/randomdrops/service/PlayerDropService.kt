@@ -17,6 +17,24 @@ object PlayerDropService {
     ): ItemType =
         Registry.ITEM.getOrThrow(PlayerDataStorage.getOrCreateReplacedBlockDrop(uuid, original.key))
 
+    fun replaceBlockDrops(
+        uuid: UUID,
+        iterator: MutableListIterator<out ItemStack?>
+    ) {
+        val iterator = iterator as MutableListIterator<ItemStack?>
+        while (iterator.hasNext()) {
+            val stack = iterator.next() ?: continue
+            if (stack.isEmpty) continue
+
+            val originalType = stack.type.asItemType() ?: continue
+            val replacementType = getReplacedBlockDrop(uuid, originalType)
+
+            if (replacementType.key != originalType.key) {
+                iterator.set(replacementType.createItemStack(stack.amount))
+            }
+        }
+    }
+
     fun getReplacedMobDrops(
         player: Player,
         entity: LivingEntity,
@@ -27,5 +45,4 @@ object PlayerDropService {
 
         return nmsLootTableBridge.getDifferentLootTable(entity, damageSource, replacedType, true)
     }
-
 }
