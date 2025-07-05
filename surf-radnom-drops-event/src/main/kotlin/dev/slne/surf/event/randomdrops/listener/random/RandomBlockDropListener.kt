@@ -57,7 +57,7 @@ object RandomBlockDropListener : Listener {
         val holder = block.state as? InventoryHolder ?: return
 
         val blockProtection = chestProtect.getBlockProtectionByBlock(block)
-        if (blockProtection == null || !blockProtection.isTrusted(event.player.uniqueId)) {
+        if (blockProtection != null && !blockProtection.isTrusted(event.player.uniqueId)) {
             return
         }
 
