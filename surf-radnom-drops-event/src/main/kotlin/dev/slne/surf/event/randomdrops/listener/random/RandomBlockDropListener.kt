@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.sksamuel.aedile.core.expireAfterWrite
 import dev.slne.surf.event.randomdrops.service.PlayerDropService
 import io.papermc.paper.event.block.PlayerShearBlockEvent
+import me.angeschossen.chestprotect.api.ChestProtectAPI
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -24,6 +25,8 @@ import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 object RandomBlockDropListener : Listener {
+    private val chestProtect = ChestProtectAPI.getInstance()
+
     private val breakSource = Caffeine.newBuilder()
         .expireAfterWrite(1.minutes)
         .weakValues()
@@ -52,6 +55,12 @@ object RandomBlockDropListener : Listener {
     fun onBlockBreak(event: BlockBreakEvent) {
         val block = event.block
         val holder = block.state as? InventoryHolder ?: return
+
+        val blockProtection = chestProtect.getBlockProtectionByBlock(block)
+        if (blockProtection == null || !blockProtection.isTrusted(event.player.uniqueId)) {
+            return
+        }
+
         holder.inventory.storageContents
             .filterNotNull()
             .forEach { block.world.dropItemNaturally(block.location, it) }
