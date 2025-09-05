@@ -11,3 +11,5 @@ include("surf-mythic-mobs-hook")
 include("surf-hardcore")
 include("bmbf-real-event")
 include("surf-playtime-checker")
+
+include("surf-oneblock")
