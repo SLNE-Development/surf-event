@@ -9,8 +9,11 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 data class OneBlockConfig(
     @Setting("island-placement")
     val islandPlacement: IslandPlacementConfig = IslandPlacementConfig(),
+    @Setting("loot")
+    val loot: LootConfig = LootConfig(),
 ) {
 
+    @ConfigSerializable
     data class IslandPlacementConfig(
         val spacing: Int = 100,
         val checkAround: Int = 10,
@@ -27,4 +30,11 @@ data class OneBlockConfig(
             require(checkAround in 0..16) { "Check around must be between 0 and 16" }
         }
     }
+
+    @ConfigSerializable
+    data class LootConfig(
+        val chestSpawnChancePercentage: Int = 5,
+        val mobSpawnChancePercentage: Int = 10,
+    )
+
 }

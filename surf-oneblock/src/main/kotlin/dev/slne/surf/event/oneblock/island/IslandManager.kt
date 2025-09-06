@@ -1,10 +1,10 @@
 package dev.slne.surf.event.oneblock.island
 
-import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.shynixn.mccoroutine.folia.regionDispatcher
 import com.jeff_media.morepersistentdatatypes.DataType
 import dev.slne.surf.event.oneblock.config.config
-import dev.slne.surf.event.oneblock.data.IslandData
+import dev.slne.surf.event.oneblock.data.IslandDTO
+import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.overworld
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.pdc.block.pdc
@@ -23,17 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger
 
 object IslandManager {
     private val oneBlockKey = key("one-block")
-    private val islands = Caffeine.newBuilder()
-        .build<UUID, IslandData>()
     private val idx = AtomicInteger(0)
 
-    fun hasIsland(uuid: UUID): Boolean = islands.getIfPresent(uuid) != null
-
-    fun getOwnerFromBlock(block: Block) : UUID? {
+    fun getOwnerFromBlock(block: Block): UUID? {
         return block.pdc().get(oneBlockKey, DataType.UUID)
     }
 
-    suspend fun generateIsland(data: IslandData) {
+    suspend fun generateIsland(data: IslandDTO) {
         val center = data.oneBlock
         val world = center.world
         val chunk = world.getChunkAtAsync(center).await()
@@ -57,12 +53,11 @@ object IslandManager {
     }
 
     suspend fun createIslandForPlayer(uuid: UUID): Boolean {
-        if (hasIsland(uuid)) return false
+        if (IslandService.hasIsland(uuid)) return false
 
         val spot = nextFreeSpot(overworld) ?: return false
-        val island = IslandData(uuid, spot)
+        val island = IslandService.createIslandForPlayer(uuid, spot)
         generateIsland(island)
-        islands.put(uuid, island)
 
         return true
     }
