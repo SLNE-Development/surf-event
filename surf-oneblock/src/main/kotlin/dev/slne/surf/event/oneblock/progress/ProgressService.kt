@@ -1,25 +1,27 @@
 package dev.slne.surf.event.oneblock.progress
 
-import dev.slne.surf.event.oneblock.plugin
+import dev.slne.surf.event.oneblock.config.config
+import dev.slne.surf.event.oneblock.db.IslandService
+import dev.slne.surf.event.oneblock.global.GlobalGoals
 import org.bukkit.entity.Player
 
 object ProgressService {
     fun requiredForNext(level: Int): Long {
-        val base = plugin.config.getInt("progression.base-required")
-        val mult = plugin.config.getInt("progression.multiplier")
+        val base = config.progression.baseRequired
+        val mult = config.progression.multiplier
         return (base + (level * mult)).toLong()
     }
 
     fun onBlockMined(player: Player) {
-        val isl = repo.incrementMined(player.uniqueId) ?: return
-        val need = requiredForNext(isl.level)
-        if (isl.totalMined >= need) {
-            repo.setLevel(player.uniqueId, isl.level + 1)
-            plugin.server.scheduler.runTask(plugin) {
-                player.sendMessage("§aLevel Up! §7Jetzt Level §e${isl.level + 1}§7.")
-            }
+        val island = IslandService.incrementMined(player.uniqueId) ?: return
+        val needed = requiredForNext(island.level)
+
+        if (island.totalMined >= needed) {
+            IslandService.setLevel(player.uniqueId, island.level + 1)
+            player.sendMessage("§aLevel Up! §7Jetzt Level §e${island.level + 1}§7.")
         }
-        plugin.globalGoals.bump(1)
+
+        GlobalGoals.onBlockMined()
     }
 
 }

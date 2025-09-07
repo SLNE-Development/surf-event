@@ -5,10 +5,12 @@ import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.island.IslandManager
 import dev.slne.surf.event.oneblock.messages.MessageManager
 import dev.slne.surf.event.oneblock.session.PlayerSessionManager
+import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
 import kotlinx.coroutines.runBlocking
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerQuitEvent
 import org.spigotmc.event.player.PlayerSpawnLocationEvent
 
 @Suppress("UnstableApiUsage")
@@ -25,6 +27,13 @@ object OneBlockConnectionListener : Listener {
             if (!created) {
                 event.connection.disconnect(MessageManager.unableToCreateIslandDisconnect)
             }
+        }
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        if (!server.isStopping) {
+            IslandService.flush(event.player.uniqueId)
         }
     }
 

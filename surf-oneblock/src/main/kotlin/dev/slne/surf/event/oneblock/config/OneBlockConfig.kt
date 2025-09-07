@@ -11,6 +11,12 @@ data class OneBlockConfig(
     val islandPlacement: IslandPlacementConfig = IslandPlacementConfig(),
     @Setting("loot")
     val loot: LootConfig = LootConfig(),
+    @Setting("progression")
+    val progression: ProgressionConfig = ProgressionConfig(),
+    @Setting("caching")
+    val caching: CachingConfig = CachingConfig(),
+    @Setting("global-goals")
+    val globalGoals: GlobalGoalsConfig = GlobalGoalsConfig(),
 ) {
 
     @ConfigSerializable
@@ -37,4 +43,21 @@ data class OneBlockConfig(
         val mobSpawnChancePercentage: Int = 10,
     )
 
+    @ConfigSerializable
+    data class ProgressionConfig(
+        val baseRequired: Int = 16,
+        val multiplier: Int = 8
+    )
+
+    @ConfigSerializable
+    data class CachingConfig(
+        val flushActions: Int = 50,
+        val flushOnWorldSave: Boolean = true
+    )
+
+    @ConfigSerializable
+    data class GlobalGoalsConfig(
+        val thresholds: List<Long> = listOf(1_000, 10_000, 100_000),
+        val reward: String = "HASTE"
+    )
 }

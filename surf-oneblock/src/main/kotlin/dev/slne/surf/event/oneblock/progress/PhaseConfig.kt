@@ -6,6 +6,7 @@ import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.core.api.config.createSpongeYmlConfig
 import dev.slne.surf.surfapi.core.api.config.manager.SpongeConfigManager
 import dev.slne.surf.surfapi.core.api.config.surfConfigApi
+import dev.slne.surf.surfapi.core.api.util.toObjectList
 import org.bukkit.entity.EntityType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -73,7 +74,11 @@ data class PhaseConfig(
     val unsortedPhases: List<Phase> = examplePhases,
 ) {
     @Transient
-    val phases = unsortedPhases.sortedBy { it.startsAt }
+    val phases = unsortedPhases.sortedBy { it.startsAt }.toObjectList()
+
+    init {
+        require(phases.isNotEmpty()) { "There must be at least one phase defined" }
+    }
 
     @ConfigSerializable
     data class BlockEntry(
@@ -109,6 +114,10 @@ data class PhaseConfig(
     )
 
     fun currentPhase(totalMined: Long): Phase = phases.last { totalMined >= it.startsAt }
+
+    fun findById(id: String): Phase? = phases.find { it.id == id }
+
+    fun firstPhase(): Phase = phases.minBy { it.startsAt }
 
     companion object Holder {
         private val manager: SpongeConfigManager<PhaseConfig>

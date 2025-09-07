@@ -1,6 +1,5 @@
 package dev.slne.surf.event.oneblock.listener
 
-import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.island.IslandManager
 import dev.slne.surf.event.oneblock.session.PlayerSession
 import dev.slne.surf.surfapi.bukkit.api.event.cancel

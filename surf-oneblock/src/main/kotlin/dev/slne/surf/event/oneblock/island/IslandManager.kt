@@ -9,6 +9,7 @@ import dev.slne.surf.event.oneblock.overworld
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.pdc.block.pdc
 import dev.slne.surf.surfapi.bukkit.api.util.key
+import eu.decentsoftware.holograms.api.DHAPI
 import io.papermc.paper.math.BlockPosition
 import io.papermc.paper.math.Position
 import kotlinx.coroutines.future.await
@@ -16,14 +17,24 @@ import kotlinx.coroutines.withContext
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
-import org.bukkit.block.BlockType
 import org.bukkit.util.BoundingBox
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 object IslandManager {
     private val oneBlockKey = key("one-block")
+    private val idxKey = key("island-idx")
+
     private val idx = AtomicInteger(0)
+
+    fun loadIdx() {
+        val idx = overworld.persistentDataContainer.getOrDefault(idxKey, DataType.INTEGER, 0)
+        this.idx.set(idx)
+    }
+
+    fun saveIdx() {
+        overworld.persistentDataContainer.set(idxKey, DataType.INTEGER, idx.get())
+    }
 
     fun getOwnerFromBlock(block: Block): UUID? {
         return block.pdc().get(oneBlockKey, DataType.UUID)
@@ -31,24 +42,11 @@ object IslandManager {
 
     suspend fun generateIsland(data: IslandDTO) {
         val center = data.oneBlock
-        val world = center.world
-        val chunk = world.getChunkAtAsync(center).await()
         withContext(plugin.regionDispatcher(center)) {
-            chunk.addPluginChunkTicket(plugin)
-
-            val baseY = center.blockY - 1
-            for (x in -1..1) {
-                for (z in -1..1) {
-                    val block = world.getBlockAt(center.blockX + x, baseY, center.blockZ + z)
-                    block.setBlockData(config.islandPlacement.islandBlockData, false)
-                }
-            }
+            IslandStructure.place(center)
 
             val oneBlock = center.block
             oneBlock.pdc().set(oneBlockKey, DataType.UUID, data.owner)
-            oneBlock.blockData = BlockType.TORCH.createBlockData()
-
-            chunk.removePluginChunkTicket(plugin)
         }
     }
 
@@ -58,6 +56,13 @@ object IslandManager {
         val spot = nextFreeSpot(overworld) ?: return false
         val island = IslandService.createIslandForPlayer(uuid, spot)
         generateIsland(island)
+
+        DHAPI.createHologram(
+            "oneblock-$uuid",
+            spot.clone().add(0.5, 2.3, 0.5),
+            true,
+            listOf("%oneblock_player-name_$uuid% | %oneblock_level% | %oneblock_total-blocks%"),
+        )
 
         return true
     }
