@@ -2,6 +2,9 @@ package dev.slne.surf.event.oneblock
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.database.DatabaseManager
+import dev.slne.surf.event.oneblock.command.locateOneBlockCommand
+import dev.slne.surf.event.oneblock.command.phaseChestCommand
+import dev.slne.surf.event.oneblock.command.relocateCommand
 import dev.slne.surf.event.oneblock.config.OneBlockConfigHolder
 import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.db.table.IslandTable
@@ -10,6 +13,7 @@ import dev.slne.surf.event.oneblock.island.IslandManager
 import dev.slne.surf.event.oneblock.listener.OneBlockBlockListener
 import dev.slne.surf.event.oneblock.listener.OneBlockConnectionListener
 import dev.slne.surf.event.oneblock.listener.OneBlockSaveListener
+import dev.slne.surf.event.oneblock.listener.OneBlockSpawnListener
 import dev.slne.surf.event.oneblock.papi.OneBlockPapiExpansion
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
@@ -40,6 +44,11 @@ class PaperMain : SuspendingJavaPlugin() {
         OneBlockConnectionListener.register()
         OneBlockBlockListener.register()
         OneBlockSaveListener.register()
+        OneBlockSpawnListener.register()
+
+        relocateCommand()
+        locateOneBlockCommand()
+        phaseChestCommand()
 
         IslandManager.loadIdx()
         papiHook.register(OneBlockPapiExpansion())

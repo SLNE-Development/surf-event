@@ -17,6 +17,8 @@ data class OneBlockConfig(
     val caching: CachingConfig = CachingConfig(),
     @Setting("global-goals")
     val globalGoals: GlobalGoalsConfig = GlobalGoalsConfig(),
+    @Setting("relocate")
+    val relocate: RelocateConfig = RelocateConfig(),
 ) {
 
     @ConfigSerializable
@@ -60,4 +62,11 @@ data class OneBlockConfig(
         val thresholds: List<Long> = listOf(1_000, 10_000, 100_000),
         val reward: String = "HASTE"
     )
+
+    @ConfigSerializable
+    data class RelocateConfig(
+        val relocateRadius: Int = 5,
+        val relocateCooldownSeconds: Int = 300,
+    )
+
 }

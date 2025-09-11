@@ -12,4 +12,13 @@ object MessageManager {
         },
         issue = true
     )
+
+    val unknownJoinError = CommonComponents.renderDisconnectMessage(
+        SurfComponentBuilder(),
+        "UNBEKANNTER FEHLER",
+        {
+            error("Beim Verbinden mit dem Server ist ein unerwarteter Fehler aufgetreten.")
+        },
+        issue = true
+    )
 }

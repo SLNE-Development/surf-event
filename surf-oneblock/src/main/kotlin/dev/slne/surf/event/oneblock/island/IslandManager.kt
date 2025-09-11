@@ -1,5 +1,6 @@
 package dev.slne.surf.event.oneblock.island
 
+import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.regionDispatcher
 import com.jeff_media.morepersistentdatatypes.DataType
 import dev.slne.surf.event.oneblock.config.config
@@ -10,6 +11,7 @@ import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.pdc.block.pdc
 import dev.slne.surf.surfapi.bukkit.api.util.key
 import eu.decentsoftware.holograms.api.DHAPI
+import glm_.glm.sqrt
 import io.papermc.paper.math.BlockPosition
 import io.papermc.paper.math.Position
 import kotlinx.coroutines.future.await
@@ -20,6 +22,7 @@ import org.bukkit.block.Block
 import org.bukkit.util.BoundingBox
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.sqrt
 
 object IslandManager {
     private val oneBlockKey = key("one-block")
@@ -40,6 +43,21 @@ object IslandManager {
         return block.pdc().get(oneBlockKey, DataType.UUID)
     }
 
+    fun isOneBlock(block: Block): Boolean {
+        return block.pdc().has(oneBlockKey)
+    }
+
+    fun migrateOneBlock(to: Block, owner: UUID, oldLoc: Location) {
+        to.pdc().set(oneBlockKey, DataType.UUID, owner)
+
+        DHAPI.removeHologram(hologramId(owner))
+        createHologram(owner, to.location)
+
+        plugin.launch(plugin.regionDispatcher(oldLoc)) {
+            oldLoc.block.pdc().remove(oneBlockKey)
+        }
+    }
+
     suspend fun generateIsland(data: IslandDTO) {
         val center = data.oneBlock
         withContext(plugin.regionDispatcher(center)) {
@@ -56,16 +74,21 @@ object IslandManager {
         val spot = nextFreeSpot(overworld) ?: return false
         val island = IslandService.createIslandForPlayer(uuid, spot)
         generateIsland(island)
-
-        DHAPI.createHologram(
-            "oneblock-$uuid",
-            spot.clone().add(0.5, 2.3, 0.5),
-            true,
-            listOf("%oneblock_player-name_$uuid% | %oneblock_level% | %oneblock_total-blocks%"),
-        )
+        createHologram(uuid, spot)
 
         return true
     }
+
+    private fun createHologram(uuid: UUID, loc: Location) {
+        DHAPI.createHologram(
+            hologramId(uuid),
+            loc.clone().add(0.5, 2.3, 0.5),
+            true,
+            listOf("%oneblock_player-name_$uuid% | %oneblock_level% | %oneblock_total-blocks%"),
+        )
+    }
+
+    private fun hologramId(uuid: UUID) = "oneblock-$uuid"
 
     suspend fun nextFreeSpot(world: World): Location? {
         val step = config.islandPlacement.spacing
@@ -87,9 +110,26 @@ object IslandManager {
         step: Int,
         y: Int,
     ): BlockPosition {
-        val idx = idx.getAndIncrement()
-        val x = (idx % 32) * step
-        val z = (idx / 32) * step
+        val n = idx.getAndIncrement() + 1
+
+        if (n == 1) {
+            return Position.block(0, y, 0)
+        }
+
+        val nn = n - 1
+        val a = ((sqrt(nn) + 1.0) / 2.0).toInt() // floor
+        val c = 2 * a
+        val b = n - (2 * a - 1) * (2 * a - 1)
+
+        val (sx, sz) = when {
+            b < c -> a to (-a + b)
+            b < 2 * c -> (a - (b - c)) to a
+            b < 3 * c -> (-a) to (a - (b - 2 * c))
+            else -> (-a + (b - 3 * c)) to (-a)
+        }
+
+        val x = sx * step
+        val z = sz * step
 
         return Position.block(x, y, z)
     }

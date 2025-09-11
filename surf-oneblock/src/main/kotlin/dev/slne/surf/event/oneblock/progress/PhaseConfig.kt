@@ -6,7 +6,13 @@ import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.core.api.config.createSpongeYmlConfig
 import dev.slne.surf.surfapi.core.api.config.manager.SpongeConfigManager
 import dev.slne.surf.surfapi.core.api.config.surfConfigApi
+import dev.slne.surf.surfapi.core.api.random.RandomSelector
+import dev.slne.surf.surfapi.core.api.random.Weighted
+import dev.slne.surf.surfapi.core.api.util.mutableObjectListOf
 import dev.slne.surf.surfapi.core.api.util.toObjectList
+import it.unimi.dsi.fastutil.objects.ObjectList
+import org.bukkit.block.BlockType
+import org.bukkit.block.data.BlockData
 import org.bukkit.entity.EntityType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -23,8 +29,8 @@ private val examplePhases = listOf(
             PhaseConfig.BlockEntry("minecraft:coal_ore", 10),
         ),
         entities = listOf(
-            PhaseConfig.EntityEntry(EntityType.BAT, 5),
-            PhaseConfig.EntityEntry(EntityType.SPIDER, 2),
+            PhaseConfig.EntityEntry(EntityType.BAT, 5.0),
+            PhaseConfig.EntityEntry(EntityType.SPIDER, 2.0),
         )
     ),
     Phase(
@@ -40,9 +46,9 @@ private val examplePhases = listOf(
             PhaseConfig.BlockEntry("minecraft:cobblestone", 5),
         ),
         entities = listOf(
-            PhaseConfig.EntityEntry(EntityType.BAT, 5),
-            PhaseConfig.EntityEntry(EntityType.SPIDER, 5),
-            PhaseConfig.EntityEntry(EntityType.ZOMBIE, 2),
+            PhaseConfig.EntityEntry(EntityType.BAT, 5.0),
+            PhaseConfig.EntityEntry(EntityType.SPIDER, 5.0),
+            PhaseConfig.EntityEntry(EntityType.ZOMBIE, 2.0),
         )
     ),
     Phase(
@@ -60,10 +66,10 @@ private val examplePhases = listOf(
             PhaseConfig.BlockEntry("minecraft:gravel", 5),
         ),
         entities = listOf(
-            PhaseConfig.EntityEntry(EntityType.BAT, 5),
-            PhaseConfig.EntityEntry(EntityType.SPIDER, 5),
-            PhaseConfig.EntityEntry(EntityType.ZOMBIE, 5),
-            PhaseConfig.EntityEntry(EntityType.SKELETON, 2),
+            PhaseConfig.EntityEntry(EntityType.BAT, 5.0),
+            PhaseConfig.EntityEntry(EntityType.SPIDER, 5.0),
+            PhaseConfig.EntityEntry(EntityType.ZOMBIE, 5.0),
+            PhaseConfig.EntityEntry(EntityType.SKELETON, 2.0),
         )
     )
 )
@@ -85,6 +91,7 @@ data class PhaseConfig(
         val data: String,
         val weight: Int
     ) {
+        @Transient
         val blockData = server.createBlockData(data)
 
         init {
@@ -95,10 +102,10 @@ data class PhaseConfig(
     @ConfigSerializable
     data class EntityEntry(
         val type: EntityType,
-        val chancePercentage: Int,
-    ) {
+        override val weight: Double,
+    ) : Weighted {
         init {
-            require(chancePercentage in 0..100) { "Chance percentage must be between 0 and 100" }
+            require(weight in 0.0..100.0) { "Chance percentage must be between 0 and 100" }
             require(type.isSpawnable) { "Entity type must be spawnable" }
         }
     }
@@ -111,7 +118,68 @@ data class PhaseConfig(
         val parents: List<String>,
         val blocks: List<BlockEntry>,
         val entities: List<EntityEntry>
-    )
+    ) {
+        val entitySelector by lazy {
+            entities.takeIf { entities.isNotEmpty() }?.let { entities ->
+                RandomSelector.fromWeightedIterable(entities)
+            }
+        }
+
+        val blockChoices by lazy {
+            println("[OneBlock] Building block choices for phase '$id'...")
+            buildChoices()
+        }
+        val blockSelector by lazy {
+
+            println("[OneBlock] Phase '$id' has ${blockChoices.size} block choices.")
+            RandomSelector.fromWeightedIterable(blockChoices)
+        }
+
+        private fun buildChoices(): ObjectList<WeightedBlock> {
+            val choices = mutableObjectListOf<WeightedBlock>()
+
+            choices.ensureCapacity(blocks.size)
+            for (entry in this.blocks) {
+                choices += WeightedBlock(entry.blockData, entry.weight.toDouble(), this.id)
+            }
+
+            var carry = this.weight - 1
+            for (parentId in this.parents) {
+                val parent = config.findById(parentId) ?: continue
+                val parentBlocks = parent.blocks
+                val weight = maxOf(1, carry)
+
+                choices.ensureCapacity(choices.size + parentBlocks.size)
+                for (entry in parentBlocks) {
+                    choices += WeightedBlock(entry.blockData, weight.toDouble(), parent.id)
+                }
+
+                carry = maxOf(1, carry - 1)
+            }
+
+            if (choices.isEmpty()) {
+                choices += WeightedBlock.dirt()
+            }
+
+            choices.trim()
+            println("[OneBlock] Phase '$id' block choices built: $choices")
+            return choices
+        }
+
+        data class WeightedBlock(
+            val data: BlockData,
+            override val weight: Double,
+            val phaseId: String
+        ) : Weighted {
+            companion object {
+                fun dirt() = WeightedBlock(
+                    BlockType.DIRT.createBlockData(),
+                    1.0,
+                    config.firstPhase().id
+                )
+            }
+        }
+    }
 
     fun currentPhase(totalMined: Long): Phase = phases.last { totalMined >= it.startsAt }
 
