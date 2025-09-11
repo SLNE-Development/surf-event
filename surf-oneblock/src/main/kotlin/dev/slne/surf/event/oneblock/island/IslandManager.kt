@@ -40,11 +40,13 @@ object IslandManager {
     }
 
     fun getOwnerFromBlock(block: Block): UUID? {
-        return block.pdc().get(oneBlockKey, DataType.UUID)
+        return IslandService.getOwnerFromBlock(block.location)
+//        return block.pdc().get(oneBlockKey, DataType.UUID)
     }
 
     fun isOneBlock(block: Block): Boolean {
-        return block.pdc().has(oneBlockKey)
+//        return block.pdc().has(oneBlockKey)
+        return getOwnerFromBlock(block) != null
     }
 
     fun migrateOneBlock(to: Block, owner: UUID, oldLoc: Location) {

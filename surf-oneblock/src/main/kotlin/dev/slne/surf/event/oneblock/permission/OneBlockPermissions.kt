@@ -11,4 +11,5 @@ object OneBlockPermissions : PermissionRegistry() {
     val LOCATE_OTHERS_ONE_BLOCK_COMMAND = create("$COMMAND_PREFIX.locateOneBlock.others")
     val LOCATE_OTHERS_ONE_BLOCK_TP = create("$COMMAND_PREFIX.locateOneBlock.others.tp")
     val PHASE_CHEST_COMMAND = create("$COMMAND_PREFIX.phaseChest")
+    val PHASE_COMMAND = create("$COMMAND_PREFIX.phase")
 }

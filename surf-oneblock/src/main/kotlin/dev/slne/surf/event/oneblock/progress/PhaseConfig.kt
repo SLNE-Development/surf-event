@@ -105,7 +105,6 @@ data class PhaseConfig(
         override val weight: Double,
     ) : Weighted {
         init {
-            require(weight in 0.0..100.0) { "Chance percentage must be between 0 and 100" }
             require(type.isSpawnable) { "Entity type must be spawnable" }
         }
     }
@@ -131,7 +130,6 @@ data class PhaseConfig(
             buildChoices()
         }
         val blockSelector by lazy {
-
             println("[OneBlock] Phase '$id' has ${blockChoices.size} block choices.")
             RandomSelector.fromWeightedIterable(blockChoices)
         }
@@ -148,11 +146,11 @@ data class PhaseConfig(
             for (parentId in this.parents) {
                 val parent = config.findById(parentId) ?: continue
                 val parentBlocks = parent.blocks
-                val weight = maxOf(1, carry)
+                val weightFactor = maxOf(1, carry).toDouble() * parent.weight / this.weight
 
                 choices.ensureCapacity(choices.size + parentBlocks.size)
                 for (entry in parentBlocks) {
-                    choices += WeightedBlock(entry.blockData, weight.toDouble(), parent.id)
+                    choices += WeightedBlock(entry.blockData, entry.weight * weightFactor, parent.id)
                 }
 
                 carry = maxOf(1, carry - 1)

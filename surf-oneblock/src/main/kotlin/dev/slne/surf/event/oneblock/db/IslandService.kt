@@ -7,7 +7,6 @@ import dev.slne.surf.event.oneblock.data.IslandDTO
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.core.api.util.toObjectList
 import org.bukkit.Location
-import org.gradle.internal.impldep.jcifs.util.LogStream.level
 import java.util.*
 
 object IslandService {
@@ -26,7 +25,11 @@ object IslandService {
     fun getIsland(uuid: UUID): IslandDTO? = islands.getIfPresent(uuid)
 
     fun getOwnerFromBlock(location: Location): UUID? {
-        return islands.asMap().values.find { island -> island.oneBlock == location }?.owner
+        return islands.asMap().values.find { island ->
+            val loc1 = island.oneBlock
+            val loc2 = location
+            loc1.world.uid == loc2.world.uid && loc1.blockX == loc2.blockX && loc1.blockY == loc2.blockY && loc1.blockZ == loc2.blockZ
+        }?.owner
     }
 
     suspend fun createIslandForPlayer(uuid: UUID, oneBlockLocation: Location): IslandDTO {
