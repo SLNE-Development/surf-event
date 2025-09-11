@@ -6,7 +6,6 @@ import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.core.api.config.createSpongeYmlConfig
 import dev.slne.surf.surfapi.core.api.config.manager.SpongeConfigManager
 import dev.slne.surf.surfapi.core.api.config.surfConfigApi
-import dev.slne.surf.surfapi.core.api.random.RandomSelector
 import dev.slne.surf.surfapi.core.api.random.Weighted
 import dev.slne.surf.surfapi.core.api.util.mutableObjectListOf
 import dev.slne.surf.surfapi.core.api.util.toObjectList
@@ -16,6 +15,7 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.entity.EntityType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
+import java.util.random.RandomGenerator
 
 private val examplePhases = listOf(
     Phase(
@@ -119,9 +119,15 @@ data class PhaseConfig(
         val blocks: List<BlockEntry>,
         val entities: List<EntityEntry>
     ) {
+        companion object {
+            private const val PARENT_SHARE_PER_WEIGHT = 0.15
+            private const val PARENT_SHARE_MAX = 0.60
+            private const val PARENT_DECAY = 0.5
+        }
+
         val entitySelector by lazy {
             entities.takeIf { entities.isNotEmpty() }?.let { entities ->
-                RandomSelector.fromWeightedIterable(entities)
+                SimpleWeightedSelector(entities)
             }
         }
 
@@ -131,29 +137,57 @@ data class PhaseConfig(
         }
         val blockSelector by lazy {
             println("[OneBlock] Phase '$id' has ${blockChoices.size} block choices.")
-            RandomSelector.fromWeightedIterable(blockChoices)
+            SimpleWeightedSelector(blockChoices)
         }
 
         private fun buildChoices(): ObjectList<WeightedBlock> {
             val choices = mutableObjectListOf<WeightedBlock>()
+
+            val ownTotal = blocks.sumOf { it.weight.toDouble() }
 
             choices.ensureCapacity(blocks.size)
             for (entry in this.blocks) {
                 choices += WeightedBlock(entry.blockData, entry.weight.toDouble(), this.id)
             }
 
-            var carry = this.weight - 1
-            for (parentId in this.parents) {
+            val extraSteps = (this.weight - 1).coerceAtLeast(0)
+            val parentShare = (extraSteps * PARENT_SHARE_PER_WEIGHT).coerceIn(0.0, PARENT_SHARE_MAX)
+            val parentBudget = ownTotal * parentShare
+            var remainingBudget = parentBudget
+
+            var levelFactor = 1.0
+            var levelFactorSum = 0.0
+            val levelFactors = ArrayList<Double>(parents.size)
+            for (i in parents.indices) {
+                levelFactors += levelFactor
+                levelFactorSum += levelFactor
+                levelFactor *= PARENT_DECAY
+            }
+
+            for ((idx, parentId) in parents.withIndex()) {
+                if (remainingBudget <= 1e-9) break
                 val parent = config.findById(parentId) ?: continue
                 val parentBlocks = parent.blocks
-                val weightFactor = maxOf(1, carry).toDouble() * parent.weight / this.weight
+                if (parentBlocks.isEmpty()) continue
+
+                val parentRawTotal = parentBlocks.sumOf { it.weight.toDouble() }
+                if (parentRawTotal <= 0.0) continue
+
+                val shareForThisParent = if (levelFactorSum > 0.0)
+                    parentBudget * (levelFactors[idx] / levelFactorSum)
+                else 0.0
+
+                val assigned = shareForThisParent.coerceAtMost(remainingBudget)
+                val scale = assigned / parentRawTotal
 
                 choices.ensureCapacity(choices.size + parentBlocks.size)
                 for (entry in parentBlocks) {
-                    choices += WeightedBlock(entry.blockData, entry.weight * weightFactor, parent.id)
+                    val w = entry.weight.toDouble() * scale
+                    if (w > 0.0) {
+                        choices += WeightedBlock(entry.blockData, w, parent.id)
+                    }
                 }
-
-                carry = maxOf(1, carry - 1)
+                remainingBudget -= assigned
             }
 
             if (choices.isEmpty()) {
@@ -161,7 +195,24 @@ data class PhaseConfig(
             }
 
             choices.trim()
-            println("[OneBlock] Phase '$id' block choices built: $choices")
+            val total = choices.sumOf { it.weight }
+            println(
+                "[OneBlock] Phase '$id' block choices built (ownTotal=$ownTotal, parentBudget=${
+                    "%.3f".format(
+                        parentBudget
+                    )
+                }, finalTotal=${"%.3f".format(total)}):"
+            )
+            choices.forEach {
+                val p = if (total > 0) it.weight / total * 100.0 else 0.0
+                println(
+                    "  - ${it.data.material} (from=${it.phaseId}) w=${"%.3f".format(it.weight)}  ~ ${
+                        "%.2f".format(
+                            p
+                        )
+                    }%"
+                )
+            }
             return choices
         }
 
@@ -200,5 +251,46 @@ data class PhaseConfig(
         fun reloadFromFile() = manager.reloadFromFile()
     }
 }
+
+
+interface SimpleSelector<E> {
+    fun pick(randomGenerator: RandomGenerator = RandomGenerator.getDefault()): E
+}
+
+class SimpleWeightedSelector<T : Weighted>(
+    items: Iterable<T>
+) : SimpleSelector<T> {
+
+    private val elements: List<T>
+    private val cumulative: DoubleArray
+
+    init {
+        val tmp = items.toList()
+        require(tmp.isNotEmpty()) { "Selector must have at least one element." }
+
+        var cum = 0.0
+        cumulative = DoubleArray(tmp.size)
+        for (i in tmp.indices) {
+            val w = tmp[i].weight
+            require(w > 0.0) { "Weight must be > 0 (got $w at index $i)." }
+            cum += w
+            cumulative[i] = cum
+        }
+        elements = tmp
+    }
+
+    override fun pick(randomGenerator: RandomGenerator): T {
+        val total = cumulative[cumulative.lastIndex]
+        val r = randomGenerator.nextDouble(total)
+        var lo = 0
+        var hi = cumulative.lastIndex
+        while (lo < hi) {
+            val mid = (lo + hi) ushr 1
+            if (r <= cumulative[mid]) hi = mid else lo = mid + 1
+        }
+        return elements[lo]
+    }
+}
+
 
 val phaseConfig: PhaseConfig get() = PhaseConfig.config

@@ -49,7 +49,7 @@ private fun startRelocate(player: Player) {
 private fun finishRelocate(player: Player, loc: Location) {
     plugin.launch {
         val session = PlayerSession[player.uniqueId]
-        val result = session.finishRelocate(loc)
+        val result = session.finishRelocate(player, loc)
         player.sendMessage(result)
         player.updateCommands()
     }
