@@ -17,8 +17,10 @@ import org.bukkit.Location
 import org.bukkit.block.Chest
 import org.bukkit.command.CommandSender
 import org.bukkit.inventory.ItemStack
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-fun phaseChestCommand() = commandAPICommand("phasechest") {
+fun phaseChestCommand() = commandTree("phasechest") {
     withPermission(OneBlockPermissions.PHASE_CHEST_COMMAND)
 
     literalArgument("create") {
@@ -66,6 +68,7 @@ fun phaseChestCommand() = commandAPICommand("phasechest") {
     }
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 private fun create(sender: CommandSender, name: String, chestLocation: Location, weight: Double) {
     val exists = phaseChests.chests.find { it.name == name }
     if (exists != null) {
@@ -92,7 +95,7 @@ private fun create(sender: CommandSender, name: String, chestLocation: Location,
         val serializedContent = ItemStack.serializeItemsAsBytes(inventory.contents)
         phaseChests.chests += PhaseChests.ChestEntry(
             name = name,
-            content = serializedContent,
+            contentBase64 = Base64.encode(serializedContent),
             weight = weight,
         )
     }

@@ -10,6 +10,8 @@ import org.bukkit.block.Chest
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 object RollEngine {
     fun roll(player: Player): Outcome {
@@ -33,13 +35,15 @@ object RollEngine {
         return Outcome(picked.data, spawnAction)
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     private fun spawnChestLoot(world: World, at: Location, phaseId: String) {
+        val entry = phaseChests.chestSelectors.get(phaseId)?.pick() ?: return
+
         val block = at.block
         block.blockData = BlockType.CHEST.createBlockData()
         block.state.apply {
             require(this is Chest)
-            val entry = phaseChests.chestSelectors.get(phaseId).pick()
-            val rawContent = entry.content
+            val rawContent = Base64.decode(entry.contentBase64)
             val content = ItemStack.deserializeItemsFromBytes(rawContent)
             val leftOver = blockInventory.addItem(*content)
 

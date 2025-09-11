@@ -14,37 +14,22 @@ data class PhaseChests(
     val chests: MutableList<ChestEntry> = mutableListOf(),
 ) {
     val chestSelectors = Caffeine.newBuilder()
-        .build<String, RandomSelector<ChestEntry>> { phaseId ->
-            RandomSelector.fromWeightedIterable(chests.filter { phaseId in it.phases })
+        .build<String, RandomSelector<ChestEntry>?> { phaseId ->
+            val chestEntries = chests.filter { phaseId in it.phases }
+            if (chestEntries.isEmpty()) {
+                null
+            } else {
+                RandomSelector.fromWeightedIterable(chestEntries)
+            }
         }
 
     @ConfigSerializable
     data class ChestEntry(
         val name: String,
         val phases: MutableList<String> = mutableListOf(),
-        val content: ByteArray,
+        val contentBase64: String,
         override val weight: Double
-    ) : Weighted {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is ChestEntry) return false
-
-            if (weight != other.weight) return false
-            if (name != other.name) return false
-            if (phases != other.phases) return false
-            if (!content.contentEquals(other.content)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = weight.hashCode()
-            result = 31 * result + name.hashCode()
-            result = 31 * result + phases.hashCode()
-            result = 31 * result + content.contentHashCode()
-            return result
-        }
-    }
+    ) : Weighted
 
     companion object {
         private val manager: SpongeConfigManager<PhaseChests>
