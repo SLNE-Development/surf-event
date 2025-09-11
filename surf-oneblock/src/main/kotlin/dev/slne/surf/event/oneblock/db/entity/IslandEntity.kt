@@ -16,7 +16,6 @@ class IslandEntity(id: EntityID<Long>) : LongEntity(id) {
     var oneBlockY by IslandTable.oneBlockY
     var oneBlockZ by IslandTable.oneBlockZ
     var oneBlockWorld by IslandTable.oneBlockWorld
-    var level by IslandTable.level
     var totalMined by IslandTable.totalMined
 
     fun toDTO() = IslandDTO(
@@ -27,7 +26,6 @@ class IslandEntity(id: EntityID<Long>) : LongEntity(id) {
             oneBlockY,
             oneBlockZ
         ),
-        level = level,
         totalMined = totalMined
     )
 }

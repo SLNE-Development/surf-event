@@ -29,12 +29,11 @@ object IslandRepository {
         IslandEntity.all().map { it.toDTO() }
     }
 
-    suspend fun updateProgress(uuid: UUID, level: Int, totalMined: Long) =
+    suspend fun updateProgress(uuid: UUID, totalMined: Long) =
         newSuspendedTransaction(Dispatchers.IO) {
             IslandEntity.find { IslandTable.ownerUuid eq uuid }
                 .forUpdate()
                 .singleOrNull()?.apply {
-                    this.level = level
                     this.totalMined = totalMined
                 }
         }

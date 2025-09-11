@@ -8,6 +8,5 @@ object IslandTable: LongIdTable("islands") {
     val oneBlockY = double("oneblock_y")
     val oneBlockZ = double("oneblock_z")
     val oneBlockWorld = uuid("oneblock_world")
-    val level = integer("level").default(0)
     val totalMined = long("total_mined").default(0)
 }

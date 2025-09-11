@@ -7,6 +7,7 @@ import dev.slne.surf.event.oneblock.data.IslandDTO
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.core.api.util.toObjectList
 import org.bukkit.Location
+import org.gradle.internal.impldep.jcifs.util.LogStream.level
 import java.util.*
 
 object IslandService {
@@ -54,15 +55,6 @@ object IslandService {
         return dto
     }
 
-    fun setLevel(uuid: UUID, level: Int) {
-        val dto = islands.getIfPresent(uuid) ?: return
-
-        dto.level = level
-        dto.unsavedActions += 1
-
-        if (dto.unsavedActions >= config.caching.flushActions) flush(uuid)
-    }
-
     fun updateOneBlockLocation(uuid: UUID, oneBlockLocation: Location) {
         val dto = islands.getIfPresent(uuid) ?: return
         dto.oneBlock = oneBlockLocation
@@ -71,11 +63,10 @@ object IslandService {
 
     fun flush(uuid: UUID) {
         val dto = islands.getIfPresent(uuid) ?: return
-        val level = dto.level
         val mined = dto.totalMined
 
         plugin.launch {
-            IslandRepository.updateProgress(uuid, level, mined)
+            IslandRepository.updateProgress(uuid, mined)
         }
 
         dto.unsavedActions = 0

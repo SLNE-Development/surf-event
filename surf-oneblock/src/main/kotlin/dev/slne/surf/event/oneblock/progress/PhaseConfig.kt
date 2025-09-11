@@ -113,6 +113,7 @@ data class PhaseConfig(
     @ConfigSerializable
     data class Phase(
         val id: String,
+        val displayName: String = id.replaceFirstChar { it.uppercaseChar() }.replace('_', ' '),
         val startsAt: Int,
         val weight: Int,
         val parents: List<String>,

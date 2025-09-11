@@ -78,7 +78,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
 
             block.blockData = BlockType.DIRT.createBlockData()
             IslandManager.migrateOneBlock(block, uuid, island.oneBlock)
-            island.oneBlock = loc
+            IslandService.updateOneBlockLocation(uuid, loc)
 
             state.relocating = false
             state.relocateTimestamp = System.currentTimeMillis()
