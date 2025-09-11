@@ -9,6 +9,7 @@ import dev.slne.surf.surfapi.core.api.config.surfConfigApi
 import dev.slne.surf.surfapi.core.api.random.Weighted
 import dev.slne.surf.surfapi.core.api.util.mutableObjectListOf
 import dev.slne.surf.surfapi.core.api.util.toObjectList
+import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectList
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
@@ -125,20 +126,13 @@ data class PhaseConfig(
             private const val PARENT_DECAY = 0.5
         }
 
+        val entityChoices by lazy { buildEntityChoices() }
         val entitySelector by lazy {
-            entities.takeIf { entities.isNotEmpty() }?.let { entities ->
-                SimpleWeightedSelector(entities)
-            }
+            entityChoices.takeIf { it.isNotEmpty() }?.let { SimpleWeightedSelector(it) }
         }
 
-        val blockChoices by lazy {
-            println("[OneBlock] Building block choices for phase '$id'...")
-            buildChoices()
-        }
-        val blockSelector by lazy {
-            println("[OneBlock] Phase '$id' has ${blockChoices.size} block choices.")
-            SimpleWeightedSelector(blockChoices)
-        }
+        val blockChoices by lazy { buildChoices() }
+        val blockSelector by lazy { SimpleWeightedSelector(blockChoices) }
 
         private fun buildChoices(): ObjectList<WeightedBlock> {
             val choices = mutableObjectListOf<WeightedBlock>()
@@ -195,25 +189,63 @@ data class PhaseConfig(
             }
 
             choices.trim()
-            val total = choices.sumOf { it.weight }
-            println(
-                "[OneBlock] Phase '$id' block choices built (ownTotal=$ownTotal, parentBudget=${
-                    "%.3f".format(
-                        parentBudget
-                    )
-                }, finalTotal=${"%.3f".format(total)}):"
-            )
-            choices.forEach {
-                val p = if (total > 0) it.weight / total * 100.0 else 0.0
-                println(
-                    "  - ${it.data.material} (from=${it.phaseId}) w=${"%.3f".format(it.weight)}  ~ ${
-                        "%.2f".format(
-                            p
-                        )
-                    }%"
-                )
-            }
             return choices
+        }
+
+        private fun buildEntityChoices(): ObjectList<EntityEntry> {
+            val agg = Object2DoubleLinkedOpenHashMap<EntityType>(entities.size)
+
+            for (e in entities) {
+                agg.mergeDouble(e.type, e.weight) { a, b -> a + b }
+            }
+            val ownTotal = agg.values.sumOf { it }
+
+            val extraSteps = (this.weight - 1).coerceAtLeast(0)
+            val parentShare = (extraSteps * PARENT_SHARE_PER_WEIGHT).coerceIn(0.0, PARENT_SHARE_MAX)
+
+            val parentBudget = (if (ownTotal > 0.0) ownTotal else 1.0) * parentShare
+            var remainingBudget = parentBudget
+
+            var levelFactor = 1.0
+            var levelFactorSum = 0.0
+            val levelFactors = ArrayList<Double>(parents.size)
+            for (i in parents.indices) {
+                levelFactors += levelFactor
+                levelFactorSum += levelFactor
+                levelFactor *= PARENT_DECAY
+            }
+
+            for ((idx, parentId) in parents.withIndex()) {
+                if (remainingBudget <= 1e-9) break
+                val parent = config.findById(parentId) ?: continue
+                val parentEntities = parent.entities
+                if (parentEntities.isEmpty()) continue
+
+                val parentRawTotal = parentEntities.sumOf { it.weight }
+                if (parentRawTotal <= 0.0) continue
+
+                val shareForThisParent = if (levelFactorSum > 0.0)
+                    parentBudget * (levelFactors[idx] / levelFactorSum)
+                else 0.0
+
+                val assigned = shareForThisParent.coerceAtMost(remainingBudget)
+                val scale = assigned / parentRawTotal
+
+                for (e in parentEntities) {
+                    val w = e.weight * scale
+                    if (w > 0.0) {
+                        agg.mergeDouble(e.type, w) { a, b -> a + b }
+                    }
+                }
+                remainingBudget -= assigned
+            }
+
+            val out = mutableObjectListOf<EntityEntry>(agg.size)
+            for ((type, w) in agg) {
+                out += EntityEntry(type, w)
+            }
+
+            return out
         }
 
         data class WeightedBlock(
