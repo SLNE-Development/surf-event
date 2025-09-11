@@ -96,8 +96,12 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         return RelocateResult.START_RELOCATING
     }
 
-    suspend fun finishRelocate(loc: Location): RelocateResult {
+    suspend fun finishRelocate(player: Player, loc: Location): RelocateResult {
         val island = IslandService.getIsland(uuid) ?: error("Island not found for player $uuid")
+
+        if (!isInRelocationRadius(player, loc)) {
+            return RelocateResult.TOO_FAR
+        }
 
         return withContext(plugin.regionDispatcher(loc)) {
             val block = loc.block
@@ -132,14 +136,18 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
 
     suspend fun isInRangeOfOneBlock(player: Player): Boolean {
         val island = IslandService.getIsland(uuid) ?: return false
-        if (player.world != island.oneBlock.world) {
+        return isInRelocationRadius(player, island.oneBlock)
+    }
+
+    private suspend fun isInRelocationRadius(player: Player, location: Location): Boolean {
+        if (player.world != location.world) {
             return false
         }
 
         val maxDistanceSquared = config.relocate.relocateRadius pow 2
 
         return withContext(plugin.entityDispatcher(player)) {
-            player.location.distanceSquared(island.oneBlock) <= maxDistanceSquared
+            player.location.distanceSquared(location) <= maxDistanceSquared
         }
     }
 
@@ -179,6 +187,10 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         NOT_IN_RANGE({
             appendPrefix()
             error("Du bist zu weit von deinem OneBlock entfernt.")
+        }),
+        TOO_FAR({
+            appendPrefix()
+            error("Der ausgewählte Ort ist zu weit von deinem OneBlock entfernt.")
         }),
         ALREADY_RELOCATING({
             appendPrefix()
