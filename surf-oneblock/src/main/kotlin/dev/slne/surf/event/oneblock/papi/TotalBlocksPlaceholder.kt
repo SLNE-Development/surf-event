@@ -11,7 +11,10 @@ class TotalBlocksPlaceholder : PapiPlaceholder("total-blocks") {
         player: OfflinePlayer,
         args: List<String>
     ): String? {
-        val island = IslandService.getIsland(player.uniqueId) ?: return null
+        val uuidString = args[0]
+        val uuid = runCatching { UUID.fromString(uuidString) }.getOrNull() ?: return null
+
+        val island = IslandService.getIsland(uuid) ?: return null
         return NumberFormat.getNumberInstance(Locale.GERMAN).format(island.totalMined)
     }
 }

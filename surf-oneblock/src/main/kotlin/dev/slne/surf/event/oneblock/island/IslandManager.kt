@@ -10,6 +10,7 @@ import dev.slne.surf.event.oneblock.overworld
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.pdc.block.pdc
 import dev.slne.surf.surfapi.bukkit.api.util.key
+import dev.slne.surf.surfapi.core.api.messages.Colors
 import dev.slne.surf.surfapi.core.api.util.random
 import eu.decentsoftware.holograms.api.DHAPI
 import glm_.glm.sqrt
@@ -17,6 +18,7 @@ import io.papermc.paper.math.BlockPosition
 import io.papermc.paper.math.Position
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -82,11 +84,27 @@ object IslandManager {
     }
 
     private fun createHologram(uuid: UUID, loc: Location) {
+        fun StringBuilder.appendColor(color: TextColor) =
+            append("<").append(color.asHexString()).append(">")
+
+        val line = buildString {
+            appendColor(Colors.PRIMARY)
+            append("%oneblock_player-name_$uuid%")
+            appendColor(Colors.SPACER)
+            append(" | ")
+            appendColor(Colors.VARIABLE_VALUE)
+            append("%oneblock_level_$uuid%")
+            appendColor(Colors.SPACER)
+            append(" | ")
+            appendColor(Colors.VARIABLE_VALUE)
+            append("%oneblock_total-blocks_$uuid%")
+        }
+
         DHAPI.createHologram(
             hologramId(uuid),
             loc.clone().add(0.5, 2.3, 0.5),
             true,
-            listOf("%oneblock_player-name_$uuid% | %oneblock_level% | %oneblock_total-blocks%"),
+            listOf(line),
         )
     }
 
