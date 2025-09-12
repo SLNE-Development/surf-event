@@ -3,6 +3,7 @@ package dev.slne.surf.event.oneblock
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.database.DatabaseManager
 import dev.slne.surf.event.oneblock.command.locateOneBlockCommand
+import dev.slne.surf.event.oneblock.command.oneBlockCommand
 import dev.slne.surf.event.oneblock.command.phaseChestCommand
 import dev.slne.surf.event.oneblock.command.phaseCommand
 import dev.slne.surf.event.oneblock.command.relocateCommand
@@ -51,6 +52,7 @@ class PaperMain : SuspendingJavaPlugin() {
         locateOneBlockCommand()
         phaseChestCommand()
         phaseCommand()
+        oneBlockCommand()
 
         IslandManager.loadIdx()
         papiHook.register(OneBlockPapiExpansion())
