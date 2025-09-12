@@ -10,6 +10,7 @@ import dev.slne.surf.event.oneblock.overworld
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.pdc.block.pdc
 import dev.slne.surf.surfapi.bukkit.api.util.key
+import dev.slne.surf.surfapi.core.api.util.random
 import eu.decentsoftware.holograms.api.DHAPI
 import glm_.glm.sqrt
 import io.papermc.paper.math.BlockPosition
@@ -22,7 +23,6 @@ import org.bukkit.block.Block
 import org.bukkit.util.BoundingBox
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.sqrt
 
 object IslandManager {
     private val oneBlockKey = key("one-block")
@@ -94,11 +94,10 @@ object IslandManager {
 
     suspend fun nextFreeSpot(world: World): Location? {
         val step = config.islandPlacement.spacing
-        val yLevel = config.islandPlacement.yLevel
         val tryCount = config.islandPlacement.tryCount
 
         repeat(tryCount) {
-            val spot = findSpot(step, yLevel).toLocation(world)
+            val spot = findSpot(step).toLocation(world)
 
             if (isSpotFree(spot)) {
                 return spot
@@ -108,11 +107,9 @@ object IslandManager {
         return null
     }
 
-    private fun findSpot(
-        step: Int,
-        y: Int,
-    ): BlockPosition {
+    private fun findSpot(step: Int): BlockPosition {
         val n = idx.getAndIncrement() + 1
+        val y = random.nextInt(config.islandPlacement.minY, config.islandPlacement.maxY)
 
         if (n == 1) {
             return Position.block(0, y, 0)
@@ -137,6 +134,7 @@ object IslandManager {
     }
 
     private suspend fun isSpotFree(loc: Location): Boolean {
+        if (IslandService.getOwnerFromBlock(loc) != null) return false
         val chunk = loc.world.getChunkAtAsync(loc).await()
 
         val notFree = withContext(plugin.regionDispatcher(loc)) {

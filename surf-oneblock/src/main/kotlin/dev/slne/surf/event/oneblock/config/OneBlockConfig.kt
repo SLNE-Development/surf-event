@@ -27,7 +27,8 @@ data class OneBlockConfig(
         val checkAround: Int = 10,
         val islandType: String = BlockType.GRASS_BLOCK.key().asString(),
         val tryCount: Int = 10,
-        val yLevel: Int = 100,
+        val minY: Int = 64,
+        val maxY: Int = 200,
         val startX: Int = 0,
         val startZ: Int = 0,
     ) {
