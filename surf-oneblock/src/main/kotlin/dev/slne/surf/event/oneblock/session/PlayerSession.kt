@@ -3,8 +3,7 @@ package dev.slne.surf.event.oneblock.session
 import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.regionDispatcher
-import com.sk89q.worldedit.WorldEdit
-import com.sk89q.worldedit.bukkit.BukkitAdapter
+import com.github.shynixn.mccoroutine.folia.ticks
 import dev.slne.surf.event.oneblock.config.config
 import dev.slne.surf.event.oneblock.data.PlayerStateDTO
 import dev.slne.surf.event.oneblock.db.IslandService
@@ -17,11 +16,10 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import glm_.pow
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.ComponentLike
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
@@ -51,27 +49,8 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
                 block.world.dropItemNaturally(blockLocation.add(0.5, 1.0, 0.5), drop)
             }
 
-            block.type = Material.AIR
-
-            withContext(Dispatchers.IO) {
-                WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(block.world))
-                    .use { session ->
-                        session.setBlock(
-                            block.x,
-                            block.y,
-                            block.z,
-                            BukkitAdapter.adapt(outcome.blockData)
-                        )
-                    }
-            }
-
-
-//            block.blockData = outcome.blockData
-//            block.state.update(true, false)
-//            block.state.update(true, false)
-//            block.world.setBlockData(block.location, outcome.blockData)
-
-
+            delay(1.ticks)
+            block.blockData = outcome.blockData
         }
 
         ProgressService.onBlockMined(player)
