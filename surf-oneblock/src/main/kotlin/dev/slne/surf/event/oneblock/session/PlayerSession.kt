@@ -37,7 +37,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         if (isRelocating) {
             return player.sendText {
                 appendPrefix()
-                error("Du kannst keine Blöcke abbauen, während du deinen OneBlock umziehst.")
+                error("Du kannst deinen OneBlock nicht abbauen, während du umziehst.")
             }
         }
 
@@ -180,6 +180,10 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
             appendPrefix()
             success("Dein OneBlock wurde erfolgreich umgezogen.")
         }),
+        ABORTED({
+            appendPrefix()
+            success("Der Umzug wurde abgebrochen.")
+        }),
         COOLDOWN({
             appendPrefix()
             error("Du musst noch warten, bevor du erneut Umziehen kannst.")
@@ -190,7 +194,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         }),
         TOO_FAR({
             appendPrefix()
-            error("Der ausgewählte Ort ist zu weit von deinem OneBlock entfernt.")
+            error("Der ausgewählte Ort ist zu weit von dir entfernt.")
         }),
         ALREADY_RELOCATING({
             appendPrefix()
