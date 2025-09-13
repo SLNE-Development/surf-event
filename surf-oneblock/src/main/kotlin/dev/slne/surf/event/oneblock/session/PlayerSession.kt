@@ -46,7 +46,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
             outcome.spawnAction?.invoke(block.world, blockLocation.add(0.5, 1.0, 0.5))
             val drops = block.getDrops(player.inventory.itemInMainHand, player)
             for (drop in drops) {
-                block.world.dropItemNaturally(blockLocation.add(0.5, 2.0, 0.5), drop)
+                block.world.dropItem(blockLocation.add(0.5, 2.0, 0.5), drop)
             }
 
             delay(1.ticks)
