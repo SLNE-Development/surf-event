@@ -104,7 +104,7 @@ object IslandManager {
 
         DHAPI.createHologram(
             hologramId(uuid),
-            loc.clone().add(0.5, 3.0, 0.5),
+            loc.clone().add(0.5, 2.3, 0.5),
             true,
             listOf(line),
         )
