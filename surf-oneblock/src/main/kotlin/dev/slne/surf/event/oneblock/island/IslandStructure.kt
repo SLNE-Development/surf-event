@@ -17,7 +17,7 @@ object IslandStructure {
         WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(center.world)).use { session ->
 //            val islandState = BukkitAdapter.adapt(config.islandPlacement.islandBlockData)
 //            val bedrockState = BlockTypes.BEDROCK!!.defaultState
-            val oneBlockState = BlockTypes.TORCH!!.defaultState
+            val oneBlockState = BlockTypes.GRASS_BLOCK!!.defaultState
 
 //            val islandRegion = CuboidRegion(
 //                BlockVector3.at(cx - 1, baseY - 2, cz - 1),
