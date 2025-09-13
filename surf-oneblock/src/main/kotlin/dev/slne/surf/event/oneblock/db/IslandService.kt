@@ -78,8 +78,8 @@ object IslandService {
     }
 
     fun flushAll() {
-        islands.asMap().forEach { (uuid, dto) ->
-            flush(uuid)
+        plugin.launch {
+            IslandRepository.saveAll(islands.asMap().values.toList())
         }
     }
 }
