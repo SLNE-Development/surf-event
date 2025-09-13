@@ -11,12 +11,13 @@ surfPaperPluginApi {
 
     serverDependencies {
         registerRequired("FastAsyncWorldEdit")
-        registerRequired("DecentHolograms")
+        registerRequired("FancyHolograms")
     }
 }
 
 repositories {
     slnePublic()
+    maven("https://repo.fancyinnovations.com/releases")
 }
 
 dependencies {
@@ -26,5 +27,5 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.9.7")
+    compileOnly("de.oliver:FancyHolograms:2.7.0")
 }

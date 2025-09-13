@@ -3,6 +3,9 @@ package dev.slne.surf.event.oneblock.island
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.regionDispatcher
 import com.jeff_media.morepersistentdatatypes.DataType
+import de.oliver.fancyholograms.api.FancyHologramsPlugin
+import de.oliver.fancyholograms.api.data.TextHologramData
+import de.oliver.fancyholograms.api.hologram.Hologram
 import dev.slne.surf.event.oneblock.config.config
 import dev.slne.surf.event.oneblock.data.IslandDTO
 import dev.slne.surf.event.oneblock.db.IslandService
@@ -10,15 +13,14 @@ import dev.slne.surf.event.oneblock.overworld
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.pdc.block.pdc
 import dev.slne.surf.surfapi.bukkit.api.util.key
-import dev.slne.surf.surfapi.core.api.messages.Colors
+import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.util.random
-import eu.decentsoftware.holograms.api.DHAPI
 import glm_.glm.sqrt
 import io.papermc.paper.math.BlockPosition
 import io.papermc.paper.math.Position
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.withContext
-import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
@@ -54,8 +56,12 @@ object IslandManager {
     fun migrateOneBlock(to: Block, owner: UUID, oldLoc: Location) {
         to.pdc().set(oneBlockKey, DataType.UUID, owner)
 
-        DHAPI.removeHologram(hologramId(owner))
-        createHologram(owner, to.location)
+        FancyHologramsPlugin.get().hologramManager.getHologram(hologramId(owner))
+            .ifPresentOrElse({ hologram ->
+                hologram.data.setLocation(toHologramLocation(to.location))
+            }, {
+                createHologram(owner, to.location)
+            })
 
         plugin.launch(plugin.regionDispatcher(oldLoc)) {
             oldLoc.block.pdc().remove(oneBlockKey)
@@ -84,31 +90,33 @@ object IslandManager {
     }
 
     private fun createHologram(uuid: UUID, loc: Location) {
-        fun StringBuilder.appendColor(color: TextColor) =
-            append("<").append(color.asHexString()).append(">")
-
-        val line = buildString {
-            append(" ")
-            appendColor(Colors.PRIMARY)
-            append("%oneblock_player-name_$uuid%")
-            appendColor(Colors.SPACER)
-            append(" | ")
-            appendColor(Colors.VARIABLE_VALUE)
-            append("%oneblock_level_$uuid%")
-            appendColor(Colors.SPACER)
-            append(" | ")
-            appendColor(Colors.VARIABLE_VALUE)
-            append("%oneblock_total-blocks_$uuid%")
-            append(" ")
+        val line = buildText {
+            text(" ")
+            primary("%oneblock_player-name_$uuid%")
+            spacer(" | ")
+            variableValue("%oneblock_level_$uuid%")
+            spacer(" | ")
+            variableValue("%oneblock_total-blocks_$uuid%")
+            text(" ")
         }
 
-        DHAPI.createHologram(
-            hologramId(uuid),
-            loc.clone().add(0.5, 2.3, 0.5),
-            true,
-            listOf(line),
-        )
+        val hologramData = TextHologramData(hologramId(uuid), toHologramLocation(loc)).apply {
+            text = listOf(MiniMessage.miniMessage().serialize(line))
+            textUpdateInterval = 1000
+            isSeeThrough = false
+            isPersistent = true
+            setTextShadow(true)
+            background = Hologram.TRANSPARENT
+        }
+
+        val manager = FancyHologramsPlugin.get().hologramManager
+        val hologram = manager.create(hologramData)
+
+        manager.addHologram(hologram)
     }
+
+    private fun toHologramLocation(loc: Location) = loc.clone().add(0.5, 2.3, 0.5)
+
 
     private fun hologramId(uuid: UUID) = "oneblock-$uuid"
 
