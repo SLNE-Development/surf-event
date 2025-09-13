@@ -2,7 +2,6 @@ package dev.slne.surf.event.oneblock.db
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.shynixn.mccoroutine.folia.launch
-import dev.slne.surf.event.oneblock.config.OneBlockConfigHolder.config
 import dev.slne.surf.event.oneblock.data.IslandDTO
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.core.api.util.toObjectList
@@ -51,9 +50,6 @@ object IslandService {
     fun incrementMined(uuid: UUID): IslandDTO? {
         val dto = islands.getIfPresent(uuid) ?: return null
         dto.totalMined += 1
-        dto.unsavedActions += 1
-
-        if (dto.unsavedActions >= config.caching.flushActions) flush(uuid)
 
         return dto
     }
@@ -71,8 +67,6 @@ object IslandService {
         plugin.launch {
             IslandRepository.updateProgress(uuid, mined)
         }
-
-        dto.unsavedActions = 0
     }
 
     fun flushPosition(uuid: UUID) {
@@ -85,7 +79,7 @@ object IslandService {
 
     fun flushAll() {
         islands.asMap().forEach { (uuid, dto) ->
-            if (dto.unsavedActions > 0) flush(uuid)
+            flush(uuid)
         }
     }
 }

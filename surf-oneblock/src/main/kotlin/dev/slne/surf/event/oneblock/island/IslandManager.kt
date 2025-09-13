@@ -89,15 +89,15 @@ object IslandManager {
 
         val line = buildString {
             append(" ")
-            appendColor(Colors.WHITE)
+            appendColor(Colors.PRIMARY)
             append("%oneblock_player-name_$uuid%")
-            appendColor(Colors.WHITE)
+            appendColor(Colors.SPACER)
             append(" | ")
-            appendColor(Colors.WHITE)
+            appendColor(Colors.VARIABLE_VALUE)
             append("%oneblock_level_$uuid%")
-            appendColor(Colors.WHITE)
+            appendColor(Colors.SPACER)
             append(" | ")
-            appendColor(Colors.WHITE)
+            appendColor(Colors.VARIABLE_VALUE)
             append("%oneblock_total-blocks_$uuid%")
             append(" ")
         }
