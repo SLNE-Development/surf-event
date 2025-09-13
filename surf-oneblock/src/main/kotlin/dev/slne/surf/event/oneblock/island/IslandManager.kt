@@ -88,21 +88,23 @@ object IslandManager {
             append("<").append(color.asHexString()).append(">")
 
         val line = buildString {
-            appendColor(Colors.PRIMARY)
+            append(" ")
+            appendColor(Colors.WHITE)
             append("%oneblock_player-name_$uuid%")
-            appendColor(Colors.SPACER)
+            appendColor(Colors.WHITE)
             append(" | ")
-            appendColor(Colors.VARIABLE_VALUE)
+            appendColor(Colors.WHITE)
             append("%oneblock_level_$uuid%")
-            appendColor(Colors.SPACER)
+            appendColor(Colors.WHITE)
             append(" | ")
-            appendColor(Colors.VARIABLE_VALUE)
+            appendColor(Colors.WHITE)
             append("%oneblock_total-blocks_$uuid%")
+            append(" ")
         }
 
         DHAPI.createHologram(
             hologramId(uuid),
-            loc.clone().add(0.5, 2.3, 0.5),
+            loc.clone().add(0.5, 3.0, 0.5),
             true,
             listOf(line),
         )
