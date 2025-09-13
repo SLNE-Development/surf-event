@@ -56,7 +56,7 @@ class PaperMain : SuspendingJavaPlugin() {
 
     override suspend fun onDisableAsync() {
         IslandManager.saveIdx()
-        IslandService.fetchIslands()
+        IslandService.flushAll()
         dbManager.databaseProvider.disconnect()
     }
 }
