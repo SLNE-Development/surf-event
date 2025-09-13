@@ -12,11 +12,11 @@ object IslandStructure {
         val cx = center.blockX
         val cy = center.blockY
         val cz = center.blockZ
-        val baseY = cy - 1
+//        val baseY = cy - 1
 
         WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(center.world)).use { session ->
 //            val islandState = BukkitAdapter.adapt(config.islandPlacement.islandBlockData)
-            val bedrockState = BlockTypes.BEDROCK!!.defaultState
+//            val bedrockState = BlockTypes.BEDROCK!!.defaultState
             val oneBlockState = BlockTypes.TORCH!!.defaultState
 
 //            val islandRegion = CuboidRegion(
@@ -33,7 +33,7 @@ object IslandStructure {
 //            session.setBlocks<BlockState>(islandRegion, islandState)
 //            session.setBlocks<BlockState>(bedrockRegion, bedrockState)
             session.setBlock(cx, cy, cz, oneBlockState)
-            session.setBlock(cx, baseY, cz, bedrockState)
+//            session.setBlock(cx, baseY, cz, bedrockState)
         }
     }
 }
