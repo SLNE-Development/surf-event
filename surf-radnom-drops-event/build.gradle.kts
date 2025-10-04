@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.slne.surf.event"
-version = "1.0.1"
+version = "1.1.0"
 
 surfPaperPluginApi {
     mainClass("dev.slne.surf.event.randomdrops.PaperMain")

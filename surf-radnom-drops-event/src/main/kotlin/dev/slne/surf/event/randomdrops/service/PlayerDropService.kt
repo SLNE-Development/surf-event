@@ -1,5 +1,6 @@
 package dev.slne.surf.event.randomdrops.service
 
+import dev.slne.surf.event.randomdrops.config.effectiveUuid
 import dev.slne.surf.event.randomdrops.data.PlayerDataStorage
 import dev.slne.surf.surfapi.bukkit.api.nms.bridges.nmsLootTableBridge
 import org.bukkit.Registry
@@ -15,7 +16,12 @@ object PlayerDropService {
         uuid: UUID,
         original: ItemType
     ): ItemType =
-        Registry.ITEM.getOrThrow(PlayerDataStorage.getOrCreateReplacedBlockDrop(uuid, original.key))
+        Registry.ITEM.getOrThrow(
+            PlayerDataStorage.getOrCreateReplacedBlockDrop(
+                effectiveUuid(uuid),
+                original.key
+            )
+        )
 
     fun replaceBlockDrops(
         uuid: UUID,
@@ -40,9 +46,10 @@ object PlayerDropService {
         entity: LivingEntity,
         damageSource: DamageSource
     ): Collection<ItemStack> {
-        val replacedType =
-            PlayerDataStorage.getOrCreateReplacedMobType(player.uniqueId, entity.type)
-
+        val replacedType = PlayerDataStorage.getOrCreateReplacedMobType(
+            effectiveUuid(player.uniqueId),
+            entity.type
+        )
         return nmsLootTableBridge.getDifferentLootTable(entity, damageSource, replacedType, true)
     }
 }

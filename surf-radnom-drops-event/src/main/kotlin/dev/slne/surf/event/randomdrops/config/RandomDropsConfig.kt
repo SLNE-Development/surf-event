@@ -16,14 +16,17 @@ val config by lazy {
     )
 }
 
+enum class RandomizationScope { PLAYER, GLOBAL }
+
 @ConfigSerializable
 data class RandomDropsConfig(
+    @Setting("randomization-scope")
+    val randomizationScope: RandomizationScope = RandomizationScope.PLAYER,
+
     @Setting("random-block-drop-filter")
-    val randomBlockDropFilterRaw: List<String>
+    val randomBlockDropFilterRaw: List<String> = emptyList()
 ) {
     val randomBlockDropFilter by lazy {
-        randomBlockDropFilterRaw.mapNotNull { raw ->
-            Registry.ITEM.get(Key.key(raw))
-        }.toObjectSet()
+        randomBlockDropFilterRaw.mapNotNull { raw -> Registry.ITEM.get(Key.key(raw)) }.toObjectSet()
     }
 }

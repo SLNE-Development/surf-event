@@ -19,15 +19,13 @@ object PlayerPlaytimeListener : SurfProxyEventListener<SurfProxyPrePlaytimeUpdat
 
     private val kickMessage = buildText {
         appendKickDisconnectMessage({
-            variableValue("Du hast die maximale Spielzeit auf")
-            appendNewline()
-            variableValue("diesem Server erreicht.")
+            variableValue("Du hast nicht genügend Spielzeit, um diesen Server zu betreten.")
         })
     }
 
     private val chatMessage = buildText {
         appendPrefix()
-        error("Du hast die maximale Spielzeit auf diesem Server erreicht.")
+        error("Du hast nicht genügend Spielzeit, um diesen Server zu betreten.")
     }
 
     override fun onEvent(event: SurfProxyPrePlaytimeUpdateEvent) {
@@ -69,11 +67,11 @@ object PlayerPlaytimeListener : SurfProxyEventListener<SurfProxyPrePlaytimeUpdat
             ?.getOrNull()
             ?.playtime
             ?: return true
-        return playtime <= check.maxPlaytime
+        return playtime > check.maxPlaytime
     }
 
     private fun String.isAllowed(playtime: Long): Boolean {
         val max = PlaytimeCheckerConfigManager.getPlaytimeCheck(this)?.maxPlaytime ?: return true
-        return playtime <= max
+        return playtime > max
     }
 }

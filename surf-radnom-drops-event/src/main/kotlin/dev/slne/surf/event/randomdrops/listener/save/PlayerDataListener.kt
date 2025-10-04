@@ -1,6 +1,8 @@
 package dev.slne.surf.event.randomdrops.listener.save
 
 import com.github.shynixn.mccoroutine.folia.launch
+import dev.slne.surf.event.randomdrops.config.effectiveUuid
+import dev.slne.surf.event.randomdrops.config.isGlobalScope
 import dev.slne.surf.event.randomdrops.data.PlayerDataStorage
 import dev.slne.surf.event.randomdrops.plugin
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
@@ -21,11 +23,13 @@ object PlayerDataListener : Listener {
 
     @EventHandler
     fun onWorldSave(event: WorldSaveEvent) {
-        if (event.world != server.worlds.first()) return
         plugin.launch {
-            val ms = measureTimeMillis { PlayerDataStorage.flush() }
-            log.atInfo()
-                .log("Player data flushed in $ms ms")
+            try {
+                val ms = measureTimeMillis { PlayerDataStorage.flush() }
+                log.atInfo().log("Player data flushed in $ms ms")
+            } catch (e: Throwable) {
+                log.atWarning().withCause(e).log("Failed to flush player data on world save")
+            }
         }
     }
 
@@ -33,7 +37,7 @@ object PlayerDataListener : Listener {
     fun onAsyncPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
         try {
             runBlocking {
-                PlayerDataStorage.loadCache(event.uniqueId)
+                PlayerDataStorage.loadCache(effectiveUuid(event.uniqueId))
             }
         } catch (e: Throwable) {
             log.atWarning()
@@ -59,6 +63,7 @@ object PlayerDataListener : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         if (server.isStopping) return // Should be saved by onDisableAsync
+        if (isGlobalScope) return      // Handled by global scope
         plugin.launch {
             try {
                 PlayerDataStorage.destroyCache(event.player.uniqueId)
