@@ -16,7 +16,7 @@ val config by lazy {
     )
 }
 
-enum class RandomizationScope { PLAYER, GLOBAL }
+enum class RandomizationScope { PLAYER, WORLD, GLOBAL }
 
 @ConfigSerializable
 data class RandomDropsConfig(

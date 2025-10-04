@@ -40,13 +40,13 @@ object RandomBlockDropListener : Listener {
     @EventHandler
     fun onBlockDropItem(event: BlockDropItemEvent) {
         val items = event.items
-        val uuid = event.player.uniqueId
+        val player = event.player
         breakSource.put(event.block.location, event.player)
 
         for (drop in items) {
             val dropItem = drop.itemStack
             val originalType = dropItem.type.asItemType() ?: continue
-            val replacedType = PlayerDropService.getReplacedBlockDrop(uuid, originalType)
+            val replacedType = PlayerDropService.getReplacedBlockDrop(player, originalType, event.block.world)
             drop.itemStack = replacedType.createItemStack(dropItem.amount)
         }
     }
@@ -78,7 +78,7 @@ object RandomBlockDropListener : Listener {
         for (drop in drops) {
             val originalType = drop.type.asItemType() ?: continue
             val replacedType =
-                PlayerDropService.getReplacedBlockDrop(sourcePlayer.uniqueId, originalType)
+                PlayerDropService.getReplacedBlockDrop(sourcePlayer, originalType, event.block.world)
 
             event.block.world.dropItemNaturally(
                 event.block.location,
@@ -104,15 +104,16 @@ object RandomBlockDropListener : Listener {
         val originalStack = item.itemStack
 
         item.itemStack = PlayerDropService.getReplacedBlockDrop(
-            sourcePlayer.uniqueId,
-            originalStack.type.asItemType() ?: return
+            sourcePlayer,
+            originalStack.type.asItemType() ?: return,
+            event.entity.world
         ).createItemStack(originalStack.amount)
     }
 
     @EventHandler
     fun onPlayerShearBlock(event: PlayerShearBlockEvent) {
         PlayerDropService.replaceBlockDrops(
-            event.player.uniqueId,
+            event.player,
             event.drops.listIterator()
         )
     }
@@ -121,7 +122,7 @@ object RandomBlockDropListener : Listener {
     fun onPlayerShearEntity(event: PlayerShearEntityEvent) {
         val drops = event.drops.toMutableList()
         PlayerDropService.replaceBlockDrops(
-            event.player.uniqueId,
+            event.player,
             drops.listIterator()
         )
         event.drops = drops
@@ -130,7 +131,7 @@ object RandomBlockDropListener : Listener {
     @EventHandler
     fun onPlayerHarvestBlock(event: PlayerHarvestBlockEvent) {
         PlayerDropService.replaceBlockDrops(
-            event.player.uniqueId,
+            event.player,
             event.itemsHarvested.listIterator()
         )
     }

@@ -1,8 +1,9 @@
 package dev.slne.surf.event.randomdrops.listener.save
 
 import com.github.shynixn.mccoroutine.folia.launch
-import dev.slne.surf.event.randomdrops.config.effectiveUuid
-import dev.slne.surf.event.randomdrops.config.isGlobalScope
+import dev.slne.surf.event.randomdrops.config.GLOBAL_UUID
+import dev.slne.surf.event.randomdrops.config.RandomizationScope
+import dev.slne.surf.event.randomdrops.config.config
 import dev.slne.surf.event.randomdrops.data.PlayerDataStorage
 import dev.slne.surf.event.randomdrops.plugin
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
@@ -36,8 +37,16 @@ object PlayerDataListener : Listener {
     @EventHandler
     fun onAsyncPlayerPreLogin(event: AsyncPlayerPreLoginEvent) {
         try {
-            runBlocking {
-                PlayerDataStorage.loadCache(effectiveUuid(event.uniqueId))
+            when (config.randomizationScope) {
+                RandomizationScope.PLAYER -> runBlocking {
+                    PlayerDataStorage.loadCache(event.uniqueId)
+                }
+                RandomizationScope.GLOBAL -> runBlocking {
+                    PlayerDataStorage.loadCache(GLOBAL_UUID)
+                }
+                RandomizationScope.WORLD -> {
+                    // Will be loaded on world load
+                }
             }
         } catch (e: Throwable) {
             log.atWarning()
@@ -63,14 +72,12 @@ object PlayerDataListener : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         if (server.isStopping) return // Should be saved by onDisableAsync
-        if (isGlobalScope) return      // Handled by global scope
-        plugin.launch {
-            try {
+        when (config.randomizationScope) {
+            RandomizationScope.PLAYER -> plugin.launch {
                 PlayerDataStorage.destroyCache(event.player.uniqueId)
-            } catch (e: Throwable) {
-                log.atWarning()
-                    .withCause(e)
-                    .log("Failed to destroy player data cache for ${event.player.name} (${event.player.uniqueId})")
+            }
+            RandomizationScope.GLOBAL, RandomizationScope.WORLD -> {
+                // Nothing to do
             }
         }
     }

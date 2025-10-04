@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.database.DatabaseProvider
 import dev.slne.surf.event.randomdrops.data.PlayerDataStorage
 import dev.slne.surf.event.randomdrops.listener.ListenerManager
+import dev.slne.surf.event.randomdrops.listener.save.WorldDataListener
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.io.path.div
 
@@ -17,6 +18,7 @@ class PaperMain : SuspendingJavaPlugin() {
 
     override suspend fun onEnableAsync() {
         ListenerManager.register()
+        WorldDataListener.initialLoad()
     }
 
     override suspend fun onDisableAsync() {
