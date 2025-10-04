@@ -1,3 +1,4 @@
+import dev.slne.surf.surfapi.gradle.util.registerSoft
 import dev.slne.surf.surfapi.gradle.util.withSurfApiBukkit
 
 plugins {
@@ -5,7 +6,7 @@ plugins {
 }
 
 group = "dev.slne.surf.event"
-version = "1.2.0"
+version = "1.2.1"
 
 surfPaperPluginApi {
     mainClass("dev.slne.surf.event.randomdrops.PaperMain")
@@ -17,7 +18,7 @@ surfPaperPluginApi {
     }
 
     serverDependencies  {
-        register("ChestProtect")
+        registerSoft("ChestProtect")
     }
 
 }

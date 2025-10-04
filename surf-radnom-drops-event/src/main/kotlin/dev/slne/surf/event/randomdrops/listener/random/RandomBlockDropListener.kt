@@ -5,7 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.sksamuel.aedile.core.expireAfterWrite
 import dev.slne.surf.event.randomdrops.service.PlayerDropService
 import io.papermc.paper.event.block.PlayerShearBlockEvent
-import me.angeschossen.chestprotect.api.ChestProtectAPI
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -25,7 +24,6 @@ import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 object RandomBlockDropListener : Listener {
-    private val chestProtect = ChestProtectAPI.getInstance()
 
     private val breakSource = Caffeine.newBuilder()
         .expireAfterWrite(1.minutes)
@@ -56,10 +54,7 @@ object RandomBlockDropListener : Listener {
         val block = event.block
         val holder = block.state as? InventoryHolder ?: return
 
-        val blockProtection = chestProtect.getBlockProtectionByBlock(block)
-        if (blockProtection != null && !blockProtection.isTrusted(event.player.uniqueId)) {
-            return
-        }
+        if (!isTrustedByChestProtect(block, event.player)) return
 
         holder.inventory.storageContents
             .filterNotNull()
@@ -157,5 +152,23 @@ object RandomBlockDropListener : Listener {
             .map { block.getRelative(it).location }
             .mapNotNull { breakSource.getIfPresent(it) }
             .firstOrNull()
+    }
+
+    private fun isTrustedByChestProtect(block: Block, player: Player): Boolean {
+        return try {
+            // Reflection to avoid hard dependency on ChestProtect
+            val apiClazz = Class.forName("me.angeschossen.chestprotect.api.ChestProtectAPI")
+            val getInstance = apiClazz.getMethod("getInstance")
+            val api = getInstance.invoke(null)
+
+            val getProt = apiClazz.getMethod("getBlockProtectionByBlock", Block::class.java)
+            val prot = getProt.invoke(api, block) ?: return true
+
+            val isTrusted = prot.javaClass.getMethod("isTrusted", UUID::class.java)
+            isTrusted.invoke(prot, player.uniqueId) as Boolean
+        } catch (e: Throwable) {
+            // ChestProtect not present
+            true
+        }
     }
 }
