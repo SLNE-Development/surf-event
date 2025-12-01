@@ -5,6 +5,7 @@ plugins {
 rootProject.name = "surf-event"
 
 include("surf-event-base")
+include("surf-buildit")
 include("surf-oneblock-skyblock-event")
 include("surf-radnom-drops-event")
 include("surf-mythic-mobs-hook")
