@@ -24,5 +24,9 @@ subprojects {
                 }
             }
         }
+
+        tasks.withType<GenerateModuleMetadata> {
+            suppressedValidationErrors.add("enforced-platform")
+        }
     }
 }
