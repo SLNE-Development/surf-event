@@ -1,22 +1,12 @@
 plugins {
-    kotlin("jvm")
+    id("dev.slne.surf.surfapi.gradle.velocity")
 }
 
-group = "dev.slne.surf.event"
-version = "1.21.11-1.0.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
+velocityPluginFile {
+    main = "dev.slne.surf.event.base.velocity.VelocityMain"
+    authors = listOf("red")
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-}
-
-kotlin {
-    jvmToolchain(21)
-}
-
-tasks.test {
-    useJUnitPlatform()
+    api(project(":surf-event-base:surf-event-base-api:surf-event-base-api-common"))
 }

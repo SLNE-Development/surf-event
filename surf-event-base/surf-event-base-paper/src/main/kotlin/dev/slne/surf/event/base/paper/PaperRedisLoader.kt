@@ -1,5 +1,6 @@
 package dev.slne.surf.event.base.paper
 
+import dev.slne.surf.event.base.paper.redis.listener.EventServerStateChangeListener
 import dev.slne.surf.event.base.paper.redis.listener.EventServerStateRequestListener
 import dev.slne.surf.redis.RedisApi
 
@@ -18,6 +19,7 @@ class PaperRedisLoader {
 
     private fun registerListeners() {
         redisApi.registerRequestHandler(EventServerStateRequestListener)
+        redisApi.subscribeToEvents(EventServerStateChangeListener)
     }
 
     fun disconnect() {
