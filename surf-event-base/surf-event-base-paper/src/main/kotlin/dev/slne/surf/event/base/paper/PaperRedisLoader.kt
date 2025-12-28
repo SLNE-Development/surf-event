@@ -1,7 +1,6 @@
 package dev.slne.surf.event.base.paper
 
-import dev.slne.surf.event.base.paper.redis.listener.EventServerStateChangeListener
-import dev.slne.surf.event.base.paper.redis.listener.EventServerStateRequestListener
+import dev.slne.surf.event.base.paper.manager.eventServerManager
 import dev.slne.surf.redis.RedisApi
 
 val redisLoader = PaperRedisLoader()
@@ -12,14 +11,8 @@ class PaperRedisLoader {
 
     fun connect() {
         redisApi = RedisApi.create(plugin.dataPath)
-        registerListeners()
-
+        eventServerManager.init()
         redisApi.freezeAndConnect()
-    }
-
-    private fun registerListeners() {
-        redisApi.registerRequestHandler(EventServerStateRequestListener)
-        redisApi.subscribeToEvents(EventServerStateChangeListener)
     }
 
     fun disconnect() {
