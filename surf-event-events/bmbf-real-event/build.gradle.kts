@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation(enforcedPlatform(libs.intellectualsites.bom))
+    implementation(platform(libs.intellectualsites.bom))
     compileOnly(libs.plotsquared.core)
     compileOnly(libs.plotsquared.bukkit) { isTransitive = false }
     compileOnly(libs.fawe.core)

@@ -1,6 +1,6 @@
 [versions]
 fawe = "2.12.3"
-intellectualsites = "1.52"
+intellectualsites = "1.55"
 placeholderapi = "2.11.6"
 
 [libraries]
