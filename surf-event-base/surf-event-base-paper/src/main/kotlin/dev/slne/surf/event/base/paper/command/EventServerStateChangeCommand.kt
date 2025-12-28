@@ -13,26 +13,27 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun eventServerStateChangeCommand() = commandTree("changeeventserverstate") {
     withPermission(PermissionRegistry.COMMAND_EVENT_SERVER_CHANGE_STATE)
-    eventServerStateArgument("state")
-    anyExecutor { executor, args ->
-        val current = eventServerManager.state
-        val state: EventServerState by args
+    eventServerStateArgument("state") {
+        anyExecutor { executor, args ->
+            val current = eventServerManager.state
+            val state: EventServerState by args
 
-        if (current == state) {
+            if (current == state) {
+                executor.sendText {
+                    appendPrefix()
+                    error("Der Event Server ist bereits ${current.displayName}.")
+                }
+                return@anyExecutor
+            }
+
+            redisApi.publishEvent(EventServerStateChangeRedisEvent(current, state))
+
             executor.sendText {
                 appendPrefix()
-                error("Der Event Server ist bereits ${current.displayName}.")
+                success("Der Event Server ist nun ")
+                variableValue(state.displayName)
+                success(".")
             }
-            return@anyExecutor
-        }
-
-        redisApi.publishEvent(EventServerStateChangeRedisEvent(current, state))
-
-        executor.sendText {
-            appendPrefix()
-            success("Der Event Server ist nun ")
-            variableValue(state.displayName)
-            success(".")
         }
     }
 }
