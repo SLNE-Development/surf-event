@@ -10,7 +10,7 @@ class PaperRedisLoader {
     lateinit var redisApi: RedisApi
 
     fun connect() {
-        redisApi = RedisApi.create(plugin.dataPath)
+        redisApi = RedisApi.create()
         eventServerManager.init()
         redisApi.freezeAndConnect()
     }

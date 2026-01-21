@@ -12,16 +12,13 @@
             <option value="$PROJECT_DIR$/surf-event-base" />
             <option value="$PROJECT_DIR$/surf-event-base/surf-event-base-api" />
             <option value="$PROJECT_DIR$/surf-event-base/surf-event-base-api/surf-event-base-api-common" />
-            <option value="$PROJECT_DIR$/surf-event-base/surf-event-base-api/surf-event-base-api-redis" />
             <option value="$PROJECT_DIR$/surf-event-base/surf-event-base-paper" />
             <option value="$PROJECT_DIR$/surf-event-base/surf-event-base-velocity" />
             <option value="$PROJECT_DIR$/surf-event-events" />
             <option value="$PROJECT_DIR$/surf-event-events/bmbf-real-event" />
             <option value="$PROJECT_DIR$/surf-event-events/surf-buildit" />
-            <option value="$PROJECT_DIR$/surf-event-events/surf-event-events" />
-            <option value="$PROJECT_DIR$/surf-event-events/surf-event-events/surf-buildit" />
             <option value="$PROJECT_DIR$/surf-event-events/surf-hardcore" />
-            <option value="$PROJECT_DIR$/surf-event-events/surf-oneblock-skyblock-event" />
+            <option value="$PROJECT_DIR$/surf-event-events/surf-oneblock" />
             <option value="$PROJECT_DIR$/surf-event-events/surf-random-drops-event" />
             <option value="$PROJECT_DIR$/surf-event-mythic-mobs" />
           </set>
