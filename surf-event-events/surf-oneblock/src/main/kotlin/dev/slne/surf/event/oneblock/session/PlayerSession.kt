@@ -34,7 +34,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
     fun onMine(player: Player, block: Block) {
         if (isRelocating) {
             return player.sendText {
-                appendPrefix()
+                appendErrorPrefix()
                 error("Du kannst deinen OneBlock nicht abbauen, während du umziehst.")
             }
         }
@@ -150,7 +150,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
 
     enum class RelocateResult(message: SurfComponentBuilder.() -> Unit) : ComponentLike {
         START_RELOCATING({
-            appendPrefix()
+            appendSuccessPrefix()
             success("Du kannst nun einen neuen Ort für deinen OneBlock auswählen.")
             appendNewPrefixedLine {
                 info("Wähle dazu einen Block aus und benutze ")
@@ -158,31 +158,31 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
             }
         }),
         RELOCATED({
-            appendPrefix()
+            appendSuccessPrefix()
             success("Dein OneBlock wurde erfolgreich umgezogen.")
         }),
         ABORTED({
-            appendPrefix()
+            appendSuccessPrefix()
             success("Der Umzug wurde abgebrochen.")
         }),
         COOLDOWN({
-            appendPrefix()
+            appendErrorPrefix()
             error("Du musst noch warten, bevor du erneut Umziehen kannst.")
         }),
         NOT_IN_RANGE({
-            appendPrefix()
+            appendErrorPrefix()
             error("Du bist zu weit von deinem OneBlock entfernt.")
         }),
         TOO_FAR({
-            appendPrefix()
+            appendErrorPrefix()
             error("Der ausgewählte Ort ist zu weit von dir entfernt.")
         }),
         ALREADY_RELOCATING({
-            appendPrefix()
+            appendErrorPrefix()
             error("Du befindest dich bereits im Umzugsmodus.")
         }),
         LOCATION_OCCUPIED({
-            appendPrefix()
+            appendErrorPrefix()
             error("Der Zielort ist ungültig oder bereits belegt.")
         });
 

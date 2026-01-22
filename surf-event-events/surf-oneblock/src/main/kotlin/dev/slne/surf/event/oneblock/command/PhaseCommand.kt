@@ -17,7 +17,7 @@ fun phaseCommand() = commandTree("phase") {
         anyExecutor { sender, _ ->
             PhaseConfig.reloadFromFile()
             sender.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Phase configuration reloaded.")
             }
         }
@@ -37,12 +37,12 @@ fun phaseCommand() = commandTree("phase") {
 
             if (errors.isEmpty()) {
                 sender.sendText {
-                    appendPrefix()
+                    appendSuccessPrefix()
                     success("Phase configuration is valid.")
                 }
             } else {
                 sender.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Phase configuration has ${errors.size} errors:")
                     appendCollectionNewLine(errors) { error ->
                         buildText {

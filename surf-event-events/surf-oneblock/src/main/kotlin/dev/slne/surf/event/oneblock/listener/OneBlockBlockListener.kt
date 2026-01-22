@@ -21,7 +21,7 @@ object OneBlockBlockListener : Listener {
         event.cancel()
         if (owner != event.player.uniqueId) {
             event.player.sendText {
-                appendPrefix()
+                appendErrorPrefix()
                 error("Du kannst nur deinen eigenen OneBlock abbauen.")
             }
             return

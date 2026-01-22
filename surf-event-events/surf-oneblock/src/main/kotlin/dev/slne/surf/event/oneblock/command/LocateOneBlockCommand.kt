@@ -38,13 +38,13 @@ private fun locateSelf(player: Player) {
 
     if (island == null) {
         return player.sendText {
-            appendPrefix()
+            appendErrorPrefix()
             error("Du hast keinen OneBlock.")
         }
     }
 
     player.sendText {
-        appendPrefix()
+        appendSuccessPrefix()
         success("Dein OneBlock befindet sich bei ")
         variableValue("X: ${island.oneBlock.blockX} Y: ${island.oneBlock.blockY} Z: ${island.oneBlock.blockZ}")
     }
@@ -58,7 +58,7 @@ private fun locateOther(
         try {
             val target = targetFuture.await().firstOrNull() ?: run {
                 sender.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Der Spieler wurde nicht gefunden.")
                 }
                 return@launch
@@ -69,7 +69,7 @@ private fun locateOther(
 
             if (island == null) {
                 sender.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     variableValue(target.name ?: "#Unbekannt")
                     appendSpace()
                     error("hat keinen OneBlock.")
@@ -78,7 +78,7 @@ private fun locateOther(
             }
 
             sender.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 variableValue(target.name ?: targetUuid.toString())
                 success("s OneBlock befindet sich bei ")
                 variableValue("X: ${island.oneBlock.blockX} Y: ${island.oneBlock.blockY} Z: ${island.oneBlock.blockZ}")
