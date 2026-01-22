@@ -15,7 +15,7 @@ class EventServerStateArgument(nodeName: String) :
             "closed" -> EventServerState.CLOSED
             else -> throw CustomArgumentException.fromAdventureComponent {
                 buildText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Die angegebene Event Server State ist ungültig.")
                 }
             }

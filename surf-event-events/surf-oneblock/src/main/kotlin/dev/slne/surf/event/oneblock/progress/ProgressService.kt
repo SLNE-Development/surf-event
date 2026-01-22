@@ -14,7 +14,7 @@ object ProgressService {
 
         if (oldPhase.id != newPhase.id) {
             player.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Du hast jetzt ")
                 variableValue(newPhase.displayName)
                 success(" erreicht!")

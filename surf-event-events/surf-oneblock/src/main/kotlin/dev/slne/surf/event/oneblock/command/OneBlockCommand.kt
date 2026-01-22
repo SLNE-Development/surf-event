@@ -22,7 +22,7 @@ private fun reload(sender: CommandSender) {
     OneBlockConfigHolder.reloadFromFile()
 
     sender.sendText {
-        appendPrefix()
+        appendSuccessPrefix()
         success("OneBlock configuration reloaded!")
     }
 }

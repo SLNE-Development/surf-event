@@ -18,7 +18,7 @@ fun eventServerStateChangeCommand() = commandTree("changeeventserverstate") {
 
             if (current == state) {
                 executor.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Der Event Server ist bereits ${current.displayName}.")
                 }
                 return@anyExecutor
@@ -27,7 +27,7 @@ fun eventServerStateChangeCommand() = commandTree("changeeventserverstate") {
             eventServerManager.state.set(state)
 
             executor.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Der Event Server ist nun ")
                 variableValue(state.displayName)
                 success(".")
