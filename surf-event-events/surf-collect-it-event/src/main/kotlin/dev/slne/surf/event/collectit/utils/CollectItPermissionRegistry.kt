@@ -12,4 +12,6 @@ object CollectItPermissionRegistry : PermissionRegistry() {
     val COMMAND_DISPLAY_SPAWN_ITEM = create("$COMMAND_DISPLAY_SPAWN.item")
     val COMMAND_DISPLAY_SPAWN_ENTITY = create("$COMMAND_DISPLAY_SPAWN.entity")
     val COMMAND_DISPLAY_SPAWN_ADVANCEMENT = create("$COMMAND_DISPLAY_SPAWN.advancement")
+
+    val COMMAND_REGISTRY = create("$COMMAND_PREFIX.registry")
 }

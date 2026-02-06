@@ -1,4 +1,4 @@
-package dev.slne.surf.event.collectit.commands.subcommands
+package dev.slne.surf.event.collectit.commands.display.subcommands
 
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.kotlindsl.playerExecutor

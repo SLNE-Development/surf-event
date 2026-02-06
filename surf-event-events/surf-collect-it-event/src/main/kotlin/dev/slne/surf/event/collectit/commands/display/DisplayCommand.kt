@@ -1,8 +1,8 @@
-package dev.slne.surf.event.collectit.commands
+package dev.slne.surf.event.collectit.commands.display
 
 import dev.jorel.commandapi.kotlindsl.commandAPICommand
-import dev.slne.surf.event.collectit.commands.subcommands.displayInfoCommand
-import dev.slne.surf.event.collectit.commands.subcommands.spawnDisplayCommand
+import dev.slne.surf.event.collectit.commands.display.subcommands.displayInfoCommand
+import dev.slne.surf.event.collectit.commands.display.subcommands.spawnDisplayCommand
 import dev.slne.surf.event.collectit.utils.CollectItPermissionRegistry
 
 fun displayCommand() = commandAPICommand("display") {

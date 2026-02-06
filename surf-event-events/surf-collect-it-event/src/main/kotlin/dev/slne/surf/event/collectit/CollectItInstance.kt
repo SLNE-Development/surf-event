@@ -1,6 +1,7 @@
 package dev.slne.surf.event.collectit
 
-import dev.slne.surf.event.collectit.commands.displayCommand
+import dev.slne.surf.event.collectit.commands.display.displayCommand
+import dev.slne.surf.event.collectit.commands.registry.registryCommand
 import dev.slne.surf.event.collectit.display.DisplayManager
 import dev.slne.surf.event.collectit.display.HologramHolder
 import dev.slne.surf.event.collectit.utils.EXCLUDED_ITEMS
@@ -25,6 +26,7 @@ object CollectItInstance {
         HologramHolder.clearOldHolograms()
 
         displayCommand()
+        registryCommand()
 
         DisplayManager.spawnDisplays(
             startLocation = Bukkit.getWorld("world")!!.spawnLocation.clone().add(0.0, 50.0, 0.0)
