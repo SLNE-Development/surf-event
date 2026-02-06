@@ -3,6 +3,8 @@ plugins {
 }
 
 surfPaperPluginApi {
-    mainClass("dev.slne.surf.event.hardcore.PaperMain")
+    mainClass("dev.slne.surf.event.collectit.PaperMain")
     generateLibraryLoader(false)
+    foliaSupported(true)
+    authors.add("ammo")
 }

@@ -1,12 +1,8 @@
-import dev.slne.surf.surfapi.gradle.util.registerSoft
 import dev.slne.surf.surfapi.gradle.util.withSurfApiBukkit
 
 plugins {
     id("dev.slne.surf.surfapi.gradle.paper-plugin")
 }
-
-group = "dev.slne.surf.event"
-version = "1.0.0"
 
 surfPaperPluginApi {
     mainClass("dev.slne.surf.event.buildit.BuildItEvent")
@@ -16,20 +12,13 @@ surfPaperPluginApi {
         withSurfApiBukkit()
     }
 
-    serverDependencies  {
+    serverDependencies {
         register("CommandAPI")
         register("WorldEdit")
         register("PlotSquared")
         register("PlaceholderAPI")
     }
 
-}
-
-repositories {
-    mavenCentral()
-    maven { url = uri("https://jitpack.io") }
-    maven { url = uri("https://maven.enginehub.org/repo/") }
-    maven { url = uri("https://repo.extendedclip.com/releases/") }
 }
 
 dependencies {

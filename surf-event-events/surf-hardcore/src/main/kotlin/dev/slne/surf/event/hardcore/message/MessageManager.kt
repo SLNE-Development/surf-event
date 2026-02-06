@@ -3,13 +3,11 @@ package dev.slne.surf.event.hardcore.message
 import dev.slne.surf.event.hardcore.HardcorePermissions
 import dev.slne.surf.surfapi.bukkit.api.util.forEachPlayer
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes.player
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickCallback
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.gradle.internal.impldep.org.bouncycastle.oer.its.ieee1609dot2dot1.AdditionalParams.original
 
 object MessageManager {
     val nearbyPlayersWhenEmptyingLavaBucket = buildText {

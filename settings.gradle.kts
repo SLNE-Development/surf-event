@@ -7,9 +7,13 @@ include("surf-event-base:surf-event-base-api:surf-event-base-api-common")
 include("surf-event-base:surf-event-base-velocity")
 include("surf-event-base:surf-event-base-paper")
 
-include("surf-event-events:surf-buildit")
-include("surf-event-events:surf-hardcore")
-include("surf-event-events:bmbf-real-event")
-include("surf-event-events:surf-buildit")
-include("surf-event-events:surf-random-drops-event")
-include("surf-event-events:surf-oneblock")
+val events = listOf(
+    "surf-buildit",
+    "surf-hardcore",
+    "bmbf-real-event",
+    "surf-random-drops-event",
+    "surf-oneblock",
+    "surf-collect-it-event"
+).forEach { event ->
+    include("surf-event-events:$event")
+}

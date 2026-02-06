@@ -5,9 +5,6 @@ plugins {
     id("dev.slne.surf.surfapi.gradle.paper-plugin")
 }
 
-group = "dev.slne.surf.event"
-version = "1.2.1"
-
 surfPaperPluginApi {
     mainClass("dev.slne.surf.event.randomdrops.PaperMain")
     generateLibraryLoader(false)
@@ -17,15 +14,10 @@ surfPaperPluginApi {
         withSurfApiBukkit()
     }
 
-    serverDependencies  {
+    serverDependencies {
         registerSoft("ChestProtect")
     }
 
-}
-
-repositories {
-    mavenCentral()
-    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
