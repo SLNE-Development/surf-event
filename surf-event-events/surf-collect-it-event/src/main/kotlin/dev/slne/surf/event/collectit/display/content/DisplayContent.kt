@@ -1,14 +1,15 @@
 package dev.slne.surf.event.collectit.display.content
 
-import dev.slne.surf.event.collectit.display.outline.type.DisplayOutlineType
+import dev.slne.surf.event.collectit.display.outline.DisplayContainerType
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 
-interface DisplayContent {
-    val baseLocation: Location
-    val facing: BlockFace
-    val displayOutlineType: DisplayOutlineType
-
-    fun spawn()
-    fun despawn()
+abstract class DisplayContent(
+    val baseLocation: Location,
+    val facing: BlockFace,
+    val displayContainerType: DisplayContainerType
+) {
+    companion object {
+        val KEY_SUFFIX = "content"
+    }
 }
