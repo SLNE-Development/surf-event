@@ -6,4 +6,5 @@ object PermissionRegistry : PermissionRegistry() {
     const val PREFIX = "surf.event"
 
     val COMMAND_EVENT_SERVER_CHANGE_STATE = create("$PREFIX.command.changeeventserverstate")
+    val COMMAND_PLAYER_VISIBILITY = create("$PREFIX.command.playervisibility")
 }
