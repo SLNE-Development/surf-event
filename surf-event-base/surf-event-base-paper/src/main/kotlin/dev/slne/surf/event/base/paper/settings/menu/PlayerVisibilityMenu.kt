@@ -10,6 +10,7 @@ import dev.slne.surf.event.base.paper.settings.PlayerVisibilityState
 import dev.slne.surf.event.base.paper.settings.playerVisibilityService
 import dev.slne.surf.event.base.paper.settings.settingsHook
 import dev.slne.surf.surfapi.bukkit.api.builder.buildItem
+import dev.slne.surf.surfapi.bukkit.api.builder.buildLore
 import dev.slne.surf.surfapi.bukkit.api.builder.displayName
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -34,7 +35,7 @@ private const val height = 5
 private const val width = 9
 
 class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilityState) :
-    ChestGui(height, ComponentHolder.of(buildText { })) {
+    ChestGui(height, ComponentHolder.of(buildText { spacer("Spielersichtbarkeit") })) {
 
     val pane = StaticPane(1, 1, width - 2, height - 2)
     var selectedState = initialState
@@ -43,8 +44,6 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
         withOutClicks()
         withOutline(width, height)
         withBackButton(height)
-
-        addPane(pane)
         update()
 
         setOnClose {
@@ -63,12 +62,31 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
     override fun update() {
         pane.addItem(GuiItem(buildItem(Material.GREEN_DYE) {
             displayName {
-                success("Alle Spieler anzeigen")
+                note("Alle Spieler anzeigen")
 
                 if (selectedState == PlayerVisibilityState.ALL) {
-                    appendSuccessPrefix()
-                    success(" (Aktuell ausgewählt)")
+                    note(" (Aktuell ausgewählt)")
                     decorate(TextDecoration.BOLD)
+                }
+            }
+
+            if (selectedState == PlayerVisibilityState.ALL) {
+                editMeta {
+                    it.setEnchantmentGlintOverride(true)
+                }
+
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Gerade ausgewählt")
+                    }
+                }
+            } else {
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Klicke, zum auswählen")
+                    }
                 }
             }
         }) {
@@ -78,16 +96,36 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
                 appendSuccessPrefix()
                 success("Du siehst jetzt alle Spieler.")
             }
-        }, 1, 1)
+            update()
+        }, 0, 1)
 
         pane.addItem(GuiItem(buildItem(Material.YELLOW_DYE) {
             displayName {
-                success("Nur Freunde anzeigen")
+                note("Nur Freunde anzeigen")
 
                 if (selectedState == PlayerVisibilityState.FRIENDS) {
-                    appendSuccessPrefix()
-                    success(" (Aktuell ausgewählt)")
+                    note(" (Aktuell ausgewählt)")
                     decorate(TextDecoration.BOLD)
+                }
+            }
+
+            if (selectedState == PlayerVisibilityState.FRIENDS) {
+                editMeta {
+                    it.setEnchantmentGlintOverride(true)
+                }
+
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Gerade ausgewählt")
+                    }
+                }
+            } else {
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Klicke, zum auswählen")
+                    }
                 }
             }
         }) {
@@ -97,16 +135,36 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
                 appendSuccessPrefix()
                 success("Du siehst jetzt nur Freunde.")
             }
-        }, 1, 1)
+            update()
+        }, 2, 1)
 
         pane.addItem(GuiItem(buildItem(Material.ORANGE_DYE) {
             displayName {
-                success("Nur VIPs anzeigen")
+                note("Nur VIPs anzeigen")
 
                 if (selectedState == PlayerVisibilityState.VIP) {
-                    appendSuccessPrefix()
-                    success(" (Aktuell ausgewählt)")
+                    note(" (Aktuell ausgewählt)")
                     decorate(TextDecoration.BOLD)
+                }
+            }
+
+            if (selectedState == PlayerVisibilityState.VIP) {
+                editMeta {
+                    it.setEnchantmentGlintOverride(true)
+                }
+
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Gerade ausgewählt")
+                    }
+                }
+            } else {
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Klicke, zum auswählen")
+                    }
                 }
             }
         }) {
@@ -116,16 +174,36 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
                 appendSuccessPrefix()
                 success("Du siehst jetzt nur VIPs.")
             }
-        }, 1, 1)
+            update()
+        }, 4, 1)
 
         pane.addItem(GuiItem(buildItem(Material.RED_DYE) {
             displayName {
-                error("Keine Spieler anzeigen")
+                note("Keine Spieler anzeigen")
 
                 if (selectedState == PlayerVisibilityState.NONE) {
-                    appendErrorPrefix()
-                    error(" (Aktuell ausgewählt)")
+                    note(" (Aktuell ausgewählt)")
                     decorate(TextDecoration.BOLD)
+                }
+            }
+
+            if (selectedState == PlayerVisibilityState.NONE) {
+                editMeta {
+                    it.setEnchantmentGlintOverride(true)
+                }
+
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Gerade ausgewählt")
+                    }
+                }
+            } else {
+                buildLore {
+                    emptyLine()
+                    line {
+                        spacer("Klicke, zum auswählen")
+                    }
                 }
             }
         }) {
@@ -135,6 +213,11 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
                 appendSuccessPrefix()
                 success("Du siehst jetzt keine Spieler mehr.")
             }
-        }, 5, 1)
+            update()
+        }, 6, 1)
+
+        addPane(pane)
+
+        super.update()
     }
 }

@@ -1,5 +1,8 @@
 package dev.slne.surf.event.base.paper.settings
 
-enum class PlayerVisibilityState(val displayName: String) {
-    ALL("Alle Spieler"), VIP("Nur Teammitglieder"), FRIENDS("Nur Freunde"), NONE("Keine Spieler");
+enum class PlayerVisibilityState(val displayName: String, val simpleName: String) {
+    ALL("Alle Spieler", "Alle"),
+    VIP("Nur VIPs", "VIPs"),
+    FRIENDS("Nur Freunde", "Freunde"),
+    NONE("Keine Spieler", "Niemand");
 }

@@ -1,13 +1,16 @@
 package dev.slne.surf.event.base.paper.settings
 
 import dev.slne.surf.event.base.paper.plugin
+import dev.slne.surf.event.base.paper.redisApi
 import dev.slne.surf.surfapi.bukkit.api.util.forEachPlayer
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
+import dev.slne.surf.tab.api.redis.TabEntryUpdateRedisEvent
 import org.bukkit.entity.Player
 
 val playerVisibilityService = PlayerVisibilityService()
 
 class PlayerVisibilityService {
+
     fun refreshState(player: Player) {
         if (!plugin.hasSettingsHook()) {
             player.sendText {
@@ -23,62 +26,59 @@ class PlayerVisibilityService {
             if (it.uniqueId == player.uniqueId) return@forEachPlayer
 
             when (selectedState) {
-                PlayerVisibilityState.ALL -> {
-                    player.showPlayer(plugin, it)
-                }
-
-                PlayerVisibilityState.NONE -> {
-                    player.hidePlayer(plugin, it)
-                }
-
+                PlayerVisibilityState.ALL -> showPlayer(player, it)
+                PlayerVisibilityState.NONE -> hidePlayer(player, it)
                 PlayerVisibilityState.VIP -> {
                     if (it.hasPermission("surf.event.base.vip")) {
-                        player.showPlayer(plugin, it)
+                        showPlayer(player, it)
                     } else {
-                        player.hidePlayer(plugin, it)
+                        hidePlayer(player, it)
                     }
                 }
 
-                PlayerVisibilityState.FRIENDS -> {
-                    player.showPlayer(plugin, it)
-                }
+                PlayerVisibilityState.FRIENDS -> showPlayer(player, it)
             }
         }
     }
 
     fun handleJoin(player: Player) {
-        if (!plugin.hasSettingsHook()) {
-            return
-        }
+        if (!plugin.hasSettingsHook()) return
 
         forEachPlayer {
-            if (it.uniqueId == player.uniqueId) {
-                return@forEachPlayer
-            }
+            if (it.uniqueId == player.uniqueId) return@forEachPlayer
 
             val otherPlayerState = settingsHook.getSelectedState(it.uniqueId)
 
             when (otherPlayerState) {
-                PlayerVisibilityState.ALL -> {
-                    it.showPlayer(plugin, player)
-                }
-
-                PlayerVisibilityState.NONE -> {
-                    it.hidePlayer(plugin, player)
-                }
-
+                PlayerVisibilityState.ALL -> showPlayer(it, player)
+                PlayerVisibilityState.NONE -> hidePlayer(it, player)
                 PlayerVisibilityState.VIP -> {
                     if (player.hasPermission("surf.event.base.vip")) {
-                        it.showPlayer(plugin, player)
+                        showPlayer(it, player)
                     } else {
-                        it.hidePlayer(plugin, player)
+                        hidePlayer(it, player)
                     }
                 }
 
-                PlayerVisibilityState.FRIENDS -> {
-                    it.showPlayer(plugin, player)
-                }
+                PlayerVisibilityState.FRIENDS -> showPlayer(it, player)
             }
         }
+    }
+
+    private fun showPlayer(player: Player, target: Player) {
+        if (player.canSee(target)) {
+            return
+        }
+
+        player.showPlayer(plugin, target)
+        redisApi.publishEvent(TabEntryUpdateRedisEvent(target.uniqueId))
+    }
+
+    private fun hidePlayer(player: Player, target: Player) {
+        if (!player.canSee(target)) {
+            return
+        }
+
+        player.hidePlayer(plugin, target)
     }
 }

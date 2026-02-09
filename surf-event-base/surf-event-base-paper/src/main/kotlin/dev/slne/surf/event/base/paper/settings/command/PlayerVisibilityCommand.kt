@@ -16,6 +16,7 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun playerVisibilityCommand() = commandTree("playervisibility") {
     withPermission(PermissionRegistry.COMMAND_PLAYER_VISIBILITY)
+    withAliases("spielersichtbarkeit", "pv", "sv")
 
     playerExecutor { player, _ ->
         showPlayerVisibilityMenu(player)
@@ -74,7 +75,7 @@ fun playerVisibilityCommand() = commandTree("playervisibility") {
 
             player.sendText {
                 appendInfoPrefix()
-                info("Du sieht momentan ")
+                info("Du siehst momentan ")
                 variableValue(state.displayName)
                 info(".")
             }
