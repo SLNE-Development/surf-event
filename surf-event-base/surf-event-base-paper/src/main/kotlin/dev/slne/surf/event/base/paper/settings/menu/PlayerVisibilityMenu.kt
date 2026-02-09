@@ -119,6 +119,9 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
                     line {
                         spacer("Gerade ausgewählt")
                     }
+                    line {
+                        error("Die Sichtbarkeit 'Freunde' ist derzeit nicht verfügbar.")
+                    }
                 }
             } else {
                 buildLore {
@@ -126,16 +129,25 @@ class PlayerVisibilityMenu(player: HumanEntity, initialState: PlayerVisibilitySt
                     line {
                         spacer("Klicke, zum auswählen")
                     }
+
+                    line {
+                        error("Die Sichtbarkeit 'Freunde' ist derzeit nicht verfügbar.")
+                    }
                 }
             }
         }) {
-            selectedState = PlayerVisibilityState.FRIENDS
-            it.whoClicked.playClickSound()
+//            selectedState = PlayerVisibilityState.FRIENDS
+//            it.whoClicked.playClickSound()
+//            it.whoClicked.sendText {
+//                appendSuccessPrefix()
+//                success("Du siehst jetzt nur Freunde.")
+//            }
+//            update()
+
             it.whoClicked.sendText {
-                appendSuccessPrefix()
-                success("Du siehst jetzt nur Freunde.")
+                appendErrorPrefix()
+                error("Die Sichtbarkeit 'Freunde' ist derzeit nicht verfügbar.")
             }
-            update()
         }, 2, 1)
 
         pane.addItem(GuiItem(buildItem(Material.ORANGE_DYE) {

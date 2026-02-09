@@ -46,6 +46,14 @@ fun playerVisibilityCommand() = commandTree("playervisibility") {
                     return@playerExecutor
                 }
 
+                if (state == PlayerVisibilityState.FRIENDS) {
+                    player.sendText {
+                        appendErrorPrefix()
+                        error("Die Sichtbarkeit 'Freunde' ist derzeit nicht verfügbar.")
+                    }
+                    return@playerExecutor
+                }
+
                 plugin.launch {
                     settingsHook.setState(player.uniqueId, state)
                     playerVisibilityService.refreshState(player)
