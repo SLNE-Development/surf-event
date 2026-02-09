@@ -1,6 +1,7 @@
 package dev.slne.surf.event.base.paper.settings
 
 import dev.slne.surf.event.base.paper.eventServerConfig
+import dev.slne.surf.event.base.paper.permission.PermissionRegistry
 import dev.slne.surf.event.base.paper.plugin
 import dev.slne.surf.event.base.paper.redisApi
 import dev.slne.surf.surfapi.bukkit.api.util.forEachPlayer
@@ -34,7 +35,7 @@ class PlayerVisibilityService {
                 PlayerVisibilityState.ALL -> showPlayer(player, it)
                 PlayerVisibilityState.NONE -> hidePlayer(player, it)
                 PlayerVisibilityState.VIP -> {
-                    if (it.hasPermission("surf.event.base.vip")) {
+                    if (it.hasPermission(PermissionRegistry.VISIBILITY_VIP)) {
                         showPlayer(player, it)
                     } else {
                         hidePlayer(player, it)
@@ -64,7 +65,7 @@ class PlayerVisibilityService {
                 PlayerVisibilityState.ALL -> showPlayer(it, player)
                 PlayerVisibilityState.NONE -> hidePlayer(it, player)
                 PlayerVisibilityState.VIP -> {
-                    if (player.hasPermission("surf.event.base.vip")) {
+                    if (player.hasPermission(PermissionRegistry.VISIBILITY_VIP)) {
                         showPlayer(it, player)
                     } else {
                         hidePlayer(it, player)
