@@ -5,5 +5,6 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable
 data class EventServerConfig(
-    var state: EventServerState = EventServerState.CLOSED
+    var state: EventServerState = EventServerState.CLOSED,
+    var playerVisibilityEnabled: Boolean = true
 )

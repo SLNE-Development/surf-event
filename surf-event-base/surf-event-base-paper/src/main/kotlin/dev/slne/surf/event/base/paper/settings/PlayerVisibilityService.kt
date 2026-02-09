@@ -1,5 +1,6 @@
 package dev.slne.surf.event.base.paper.settings
 
+import dev.slne.surf.event.base.paper.eventServerConfig
 import dev.slne.surf.event.base.paper.plugin
 import dev.slne.surf.event.base.paper.redisApi
 import dev.slne.surf.surfapi.bukkit.api.util.forEachPlayer
@@ -12,6 +13,10 @@ val playerVisibilityService = PlayerVisibilityService()
 class PlayerVisibilityService {
 
     fun refreshState(player: Player) {
+        if (!eventServerConfig.playerVisibilityEnabled) {
+            return
+        }
+
         if (!plugin.hasSettingsHook()) {
             player.sendText {
                 appendErrorPrefix()
@@ -42,7 +47,13 @@ class PlayerVisibilityService {
     }
 
     fun handleJoin(player: Player) {
-        if (!plugin.hasSettingsHook()) return
+        if (!eventServerConfig.playerVisibilityEnabled) {
+            return
+        }
+
+        if (!plugin.hasSettingsHook()) {
+            return
+        }
 
         forEachPlayer {
             if (it.uniqueId == player.uniqueId) return@forEachPlayer

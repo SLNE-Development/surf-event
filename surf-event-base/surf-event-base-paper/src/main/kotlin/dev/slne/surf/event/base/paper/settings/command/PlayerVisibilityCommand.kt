@@ -5,6 +5,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
+import dev.slne.surf.event.base.paper.eventServerConfig
 import dev.slne.surf.event.base.paper.permission.PermissionRegistry
 import dev.slne.surf.event.base.paper.plugin
 import dev.slne.surf.event.base.paper.settings.PlayerVisibilityState
@@ -19,12 +20,28 @@ fun playerVisibilityCommand() = commandTree("playervisibility") {
     withAliases("spielersichtbarkeit", "pv", "sv")
 
     playerExecutor { player, _ ->
+        if (!eventServerConfig.playerVisibilityEnabled) {
+            player.sendText {
+                appendErrorPrefix()
+                error("Die Spieler-Sichtbarkeit ist derzeit deaktiviert.")
+            }
+            return@playerExecutor
+        }
+
         showPlayerVisibilityMenu(player)
     }
 
     literalArgument("state") {
         playerVisibilityState("state") {
             playerExecutor { player, args ->
+                if (!eventServerConfig.playerVisibilityEnabled) {
+                    player.sendText {
+                        appendErrorPrefix()
+                        error("Die Spieler-Sichtbarkeit ist derzeit deaktiviert.")
+                    }
+                    return@playerExecutor
+                }
+
                 if (!plugin.hasSettingsHook()) {
                     player.sendText {
                         appendErrorPrefix() //TODO: Error Code (Surf-Player-Error)

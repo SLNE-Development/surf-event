@@ -2,7 +2,7 @@ package dev.slne.surf.event.base.paper
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.event.base.api.common.state.EventServerState
-import dev.slne.surf.event.base.paper.command.eventServerStateChangeCommand
+import dev.slne.surf.event.base.paper.command.eventServerCommand
 import dev.slne.surf.event.base.paper.config.EventServerConfigHolder
 import dev.slne.surf.event.base.paper.manager.eventServerManager
 import dev.slne.surf.event.base.paper.settings.command.playerVisibilityCommand
@@ -21,7 +21,8 @@ class PaperMain : SuspendingJavaPlugin() {
         redisLoader.connect()
         eventServerManager.load()
         eventServerManager.updateTask()
-        eventServerStateChangeCommand()
+
+        eventServerCommand()
         playerVisibilityCommand()
 
         PlayerConnectionListener.register()
