@@ -11,18 +11,18 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 class PlayerVisibilityStateArgument(nodeName: String) :
     CustomArgument<PlayerVisibilityState, String>(StringArgument(nodeName), { info ->
         PlayerVisibilityState.entries.toTypedArray()
-            .firstOrNull { it.name.equals(info.input, true) }
+            .firstOrNull { it.displayName.equals(info.input, true) }
             ?: throw CustomArgumentException.fromAdventureComponent {
                 buildText {
                     appendErrorPrefix()
-                    error("Die angegebene Event Server State ist ungültig.")
+                    error("Der angegebene Sichtbarkeits-Status ist ungültig.")
                 }
             }
     }) {
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.strings(
-                PlayerVisibilityState.entries.map { it.name }
+                PlayerVisibilityState.entries.map { it.displayName }
             )
         )
     }
