@@ -14,7 +14,7 @@ class RedisLoader {
     fun connect() {
         redisApi = RedisApi.create()
         redisApi.createSyncValue<EventServerState>(
-            "surf-event:surf-event-server-state",
+            "surf-event:event-server-state",
             EventServerState.CLOSED
         ).also { eventServerState = it }
         redisApi.freezeAndConnect()
