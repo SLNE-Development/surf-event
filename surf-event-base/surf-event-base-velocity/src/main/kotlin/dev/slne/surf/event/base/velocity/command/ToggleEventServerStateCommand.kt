@@ -15,7 +15,7 @@ fun eventServerStateCommand() = commandTree("eventserverstate") {
             executor.sendText {
                 appendInfoPrefix()
                 info("Der Event-Server ist aktuell ")
-                variableValue(state.toString())
+                variableValue(state.displayName)
             }
         }
     }
@@ -35,7 +35,7 @@ fun eventServerStateCommand() = commandTree("eventserverstate") {
                 executor.sendText {
                     appendSuccessPrefix()
                     success("Der Event-Server wurde auf ")
-                    variableValue(eventServerState.toString())
+                    variableValue(eventServerState.displayName)
                     success(" gesetzt.")
                 }
             }
