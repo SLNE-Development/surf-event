@@ -17,3 +17,5 @@ val events = listOf(
 ).forEach { event ->
     include("surf-event-events:$event")
 }
+
+include("surf-event-base:surf-event-base-core")

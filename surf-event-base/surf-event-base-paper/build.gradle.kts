@@ -12,6 +12,7 @@ surfPaperPluginApi {
     authors.add("red")
 
     withSurfRedis()
+    withCorePaper()
 
     serverDependencies {
         registerSoft("surf-settings-paper")
@@ -19,7 +20,7 @@ surfPaperPluginApi {
 }
 
 dependencies {
-    api(project(":surf-event-base:surf-event-base-api:surf-event-base-api-common"))
+    api(project(":surf-event-base:surf-event-base-core"))
     implementation("dev.slne.surf.tab:surf-tab-api:1.21.11-1.0.2-SNAPSHOT")
     compileOnly("dev.slne.surf.settings:surf-settings-api:1.21.11-2.0.1-SNAPSHOT")
 }
