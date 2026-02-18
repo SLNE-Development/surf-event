@@ -8,5 +8,5 @@ velocityPluginFile {
 }
 
 dependencies {
-    api(project(":surf-event-base:surf-event-base-api:surf-event-base-api-common"))
+    api(project(":surf-event-base:surf-event-base-core"))
 }
