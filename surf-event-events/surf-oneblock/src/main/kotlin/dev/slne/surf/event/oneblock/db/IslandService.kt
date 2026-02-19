@@ -60,7 +60,7 @@ object IslandService {
             uuid,
             oldLoc
         )
-        
+
         return true
     }
 
@@ -112,7 +112,7 @@ object IslandService {
     }
 
     fun anyNearIslands(location: Location): Boolean = all().any { island ->
-        island.oneBlock.distanceSquared(location) < 5
+        island.oneBlock.distanceSquared(location) < 10
     }
 
     suspend fun flushAll() {
