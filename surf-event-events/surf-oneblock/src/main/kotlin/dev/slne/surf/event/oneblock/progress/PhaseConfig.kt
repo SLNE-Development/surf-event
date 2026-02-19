@@ -53,12 +53,18 @@ data class PhaseConfig(
     }
 
     @ConfigSerializable
+    data class ParentPhase(
+        val id: String,
+        val weightOverride: Int? = null
+    )
+
+    @ConfigSerializable
     data class Phase(
         val id: String,
         val displayName: String = id.replaceFirstChar { it.uppercaseChar() }.replace('_', ' '),
         val startsAt: Int,
         val weight: Int,
-        val parents: List<String>,
+        val parents: List<ParentPhase>,
         val blocks: List<BlockEntry>,
         val entities: List<EntityEntry>
     ) {
@@ -92,29 +98,32 @@ data class PhaseConfig(
             var remainingBudget = parentBudget
 
             var levelFactor = 1.0
-            var levelFactorSum = 0.0
-            val levelFactors = ArrayList<Double>(parents.size)
-            for (i in parents.indices) {
-                levelFactors += levelFactor
-                levelFactorSum += levelFactor
+            val levelFactors = parents.map {
+                val f = levelFactor
                 levelFactor *= PARENT_DECAY
+                f
             }
 
-            for ((idx, parentId) in parents.withIndex()) {
+            val effectiveParentWeights = parents.mapIndexed { idx, parentPhase ->
+                val override = parentPhase.weightOverride?.toDouble()
+                (levelFactors[idx]) * (override ?: 1.0)
+            }
+
+            val totalParentWeight = effectiveParentWeights.sum()
+
+            for ((idx, parentPhase) in parents.withIndex()) {
                 if (remainingBudget <= 1e-9) break
-                val parent = config.findById(parentId) ?: continue
+                val parent = config.findById(parentPhase.id) ?: continue
                 val parentBlocks = parent.blocks
                 if (parentBlocks.isEmpty()) continue
 
-                val parentRawTotal = parentBlocks.sumOf { it.weight.toDouble() }
-                if (parentRawTotal <= 0.0) continue
-
-                val shareForThisParent = if (levelFactorSum > 0.0)
-                    parentBudget * (levelFactors[idx] / levelFactorSum)
-                else 0.0
+                val shareForThisParent =
+                    if (totalParentWeight > 0.0)
+                        parentBudget * (effectiveParentWeights[idx] / totalParentWeight)
+                    else 0.0
 
                 val assigned = shareForThisParent.coerceAtMost(remainingBudget)
-                val scale = assigned / parentRawTotal
+                val scale = assigned / parentBlocks.sumOf { it.weight.toDouble() }
 
                 choices.ensureCapacity(choices.size + parentBlocks.size)
                 for (entry in parentBlocks) {
@@ -144,34 +153,38 @@ data class PhaseConfig(
 
             val extraSteps = (this.weight - 1).coerceAtLeast(0)
             val parentShare = (extraSteps * PARENT_SHARE_PER_WEIGHT).coerceIn(0.0, PARENT_SHARE_MAX)
-
             val parentBudget = (if (ownTotal > 0.0) ownTotal else 1.0) * parentShare
             var remainingBudget = parentBudget
 
             var levelFactor = 1.0
-            var levelFactorSum = 0.0
-            val levelFactors = ArrayList<Double>(parents.size)
-            for (i in parents.indices) {
-                levelFactors += levelFactor
-                levelFactorSum += levelFactor
+            val levelFactors = parents.map {
+                val f = levelFactor
                 levelFactor *= PARENT_DECAY
+                f
             }
 
-            for ((idx, parentId) in parents.withIndex()) {
+            val effectiveParentWeights = parents.mapIndexed { idx, parentPhase ->
+                val override = parentPhase.weightOverride?.toDouble()
+                (levelFactors[idx]) * (override ?: 1.0)
+            }
+
+            val totalParentWeight = effectiveParentWeights.sum()
+
+            for ((idx, parentPhase) in parents.withIndex()) {
                 if (remainingBudget <= 1e-9) break
-                val parent = config.findById(parentId) ?: continue
+                val parent = config.findById(parentPhase.id) ?: continue
                 val parentEntities = parent.entities
                 if (parentEntities.isEmpty()) continue
 
-                val parentRawTotal = parentEntities.sumOf { it.weight }
-                if (parentRawTotal <= 0.0) continue
-
-                val shareForThisParent = if (levelFactorSum > 0.0)
-                    parentBudget * (levelFactors[idx] / levelFactorSum)
-                else 0.0
+                val shareForThisParent =
+                    if (totalParentWeight > 0.0)
+                        parentBudget * (effectiveParentWeights[idx] / totalParentWeight)
+                    else 0.0
 
                 val assigned = shareForThisParent.coerceAtMost(remainingBudget)
-                val scale = assigned / parentRawTotal
+                val parentTotal = parentEntities.sumOf { it.weight }
+                if (parentTotal <= 0.0) continue
+                val scale = assigned / parentTotal
 
                 for (e in parentEntities) {
                     val w = e.weight * scale
