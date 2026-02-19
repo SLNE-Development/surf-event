@@ -3,6 +3,7 @@ package dev.slne.surf.event.oneblock.session
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.regionDispatcher
 import com.github.shynixn.mccoroutine.folia.ticks
+import dev.slne.surf.event.oneblock.config.config
 import dev.slne.surf.event.oneblock.data.PlayerStateDTO
 import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.db.PlayerStateService
@@ -58,6 +59,14 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
     suspend fun relocate(location: Location): RelocateResult {
         val island = IslandService.getIsland(uuid) ?: error("Island not found for player $uuid")
 
+        if (location.y >= config.islandPlacement.maxY) {
+            return RelocateResult.TO_HIGH
+        }
+
+        if (location.y <= config.islandPlacement.minY) {
+            return RelocateResult.TO_LOW
+        }
+
         return withContext(plugin.regionDispatcher(location)) {
             val block = location.block
             if (!block.isEmpty) {
@@ -95,6 +104,14 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         LOCATION_OCCUPIED({
             appendErrorPrefix()
             error("Der Zielort ist ungültig oder bereits belegt.")
+        }),
+        TO_HIGH({
+            appendErrorPrefix()
+            error("Der Zielort ist zu hoch. Bitte wählen einen niedrigeren Ort.")
+        }),
+        TO_LOW({
+            appendErrorPrefix()
+            error("Der Zielort ist zu niedrig. Bitte wählen einen höheren Ort.")
         });
 
         val message = buildText(message)
