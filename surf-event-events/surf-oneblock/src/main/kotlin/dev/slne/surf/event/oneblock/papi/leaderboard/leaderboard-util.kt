@@ -3,6 +3,8 @@ package dev.slne.surf.event.oneblock.papi.leaderboard
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
+import dev.slne.surf.surfapi.core.api.minimessage.miniMessage
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.luckperms.api.LuckPermsProvider
 import java.util.*
 
@@ -15,7 +17,8 @@ fun prefixPlayer(uuid: UUID): String {
             luckPerms.userManager.loadUser(uuid)
         }
 
-        return player.name ?: "Fehler"
+        return LegacyComponentSerializer.legacySection()
+            .serialize(miniMessage.deserialize(player.name ?: "Fehler"))
     }
 
     val primaryGroup = user.primaryGroup
@@ -23,5 +26,6 @@ fun prefixPlayer(uuid: UUID): String {
     val group = luckPerms.groupManager.getGroup(primaryGroup) ?: return player.name ?: "Fehler"
     val prefix = group.cachedData.metaData.prefix
 
-    return "$prefix ${player.name}"
+    return LegacyComponentSerializer.legacySection()
+        .serialize(miniMessage.deserialize("$prefix ${player.name}"))
 }
