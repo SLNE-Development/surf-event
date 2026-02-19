@@ -4,7 +4,7 @@ import dev.slne.surf.event.oneblock.papi.ValueHolder
 import dev.slne.surf.surfapi.bukkit.api.hook.papi.expansion.PapiPlaceholder
 import org.bukkit.OfflinePlayer
 
-object LeaderboardIsTopTenPlaceholder : PapiPlaceholder("place") {
+object LeaderboardIsTopTenPlaceholder : PapiPlaceholder("isTopTen") {
     override fun parse(
         player: OfflinePlayer,
         args: List<String>
