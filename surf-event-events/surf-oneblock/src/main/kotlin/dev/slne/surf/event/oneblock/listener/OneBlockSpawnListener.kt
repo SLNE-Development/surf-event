@@ -13,7 +13,7 @@ object OneBlockSpawnListener : Listener {
     fun onPlayerSpawnLocation(event: AsyncPlayerSpawnLocationEvent) {
         val player = event.connection.profile.id ?: return
 
-        if (!OneBlockConnectionListener.shouldTeleportToIsland(player) && event.isNewPlayer) {
+        if (!OneBlockConnectionListener.shouldTeleportToIsland(player)) {
             return
         }
 
