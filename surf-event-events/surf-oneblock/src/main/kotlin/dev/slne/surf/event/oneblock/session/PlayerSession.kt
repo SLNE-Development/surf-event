@@ -107,11 +107,11 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         }),
         TO_HIGH({
             appendErrorPrefix()
-            error("Der Zielort ist zu hoch. Bitte wählen einen niedrigeren Ort.")
+            error("Der Zielort ist zu hoch. Bitte wähle einen niedrigeren Ort.")
         }),
         TO_LOW({
             appendErrorPrefix()
-            error("Der Zielort ist zu niedrig. Bitte wählen einen höheren Ort.")
+            error("Der Zielort ist zu niedrig. Bitte wähle einen höheren Ort.")
         });
 
         val message = buildText(message)
