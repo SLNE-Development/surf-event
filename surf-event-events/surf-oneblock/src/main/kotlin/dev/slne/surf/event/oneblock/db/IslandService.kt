@@ -3,6 +3,8 @@ package dev.slne.surf.event.oneblock.db
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.event.oneblock.data.IslandDTO
+import dev.slne.surf.event.oneblock.island.IslandManager
+import dev.slne.surf.event.oneblock.overworld
 import dev.slne.surf.event.oneblock.plugin
 import dev.slne.surf.surfapi.core.api.util.toObjectList
 import org.bukkit.Location
@@ -32,6 +34,36 @@ object IslandService {
             loc1.world.uid == loc2.world.uid && loc1.blockX == loc2.blockX && loc1.blockY == loc2.blockY && loc1.blockZ == loc2.blockZ
         }?.owner
     }
+
+    suspend fun resetIsland(uuid: UUID): Boolean {
+        val dto = islands.getIfPresent(uuid) ?: return false
+
+        val newSpot = IslandManager.nextFreeSpot(overworld) ?: return false
+        val oldLoc = dto.oneBlock.clone()
+
+        dto.totalMined = 0L
+        dto.oneBlock = newSpot
+
+        IslandRepository.updatePosition(
+            uuid,
+            newSpot.x,
+            newSpot.y,
+            newSpot.z,
+            newSpot.world.uid
+        )
+
+        IslandRepository.updateProgress(uuid, 0L)
+        IslandManager.generateIsland(dto)
+
+        IslandManager.migrateOneBlock(
+            newSpot.block,
+            uuid,
+            oldLoc
+        )
+        
+        return true
+    }
+
 
     suspend fun createIslandForPlayer(uuid: UUID, oneBlockLocation: Location): IslandDTO {
         islands.getIfPresent(uuid)?.let { return it }

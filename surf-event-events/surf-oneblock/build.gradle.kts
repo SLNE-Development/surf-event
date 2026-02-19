@@ -13,6 +13,7 @@ surfPaperPluginApi {
     serverDependencies {
         registerRequired("FastAsyncWorldEdit")
         registerRequired("FancyHolograms")
+        registerRequired("LuckPerms")
     }
 }
 

@@ -1,10 +1,11 @@
 package dev.slne.surf.event.oneblock.db
 
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.batchUpsert
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.insert
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.update
 import dev.slne.surf.event.oneblock.data.IslandDTO
 import dev.slne.surf.event.oneblock.db.table.IslandTable
 import kotlinx.coroutines.flow.map
@@ -69,20 +70,19 @@ object IslandRepository {
     }
 
     suspend fun updateProgress(uuid: UUID, totalMined: Long) = suspendTransaction {
-        IslandTable.upsert {
-            it[ownerUuid] = uuid
+        IslandTable.update({ IslandTable.ownerUuid eq uuid }) {
             it[this.totalMined] = totalMined
         }
     }
 
     suspend fun updatePosition(uuid: UUID, x: Double, y: Double, z: Double, worldUuid: UUID) =
         suspendTransaction {
-            IslandTable.upsert {
-                it[ownerUuid] = uuid
+            IslandTable.update({ IslandTable.ownerUuid eq uuid }) {
                 it[oneBlockX] = x
                 it[oneBlockY] = y
                 it[oneBlockZ] = z
                 it[oneBlockWorld] = worldUuid
             }
         }
+
 }
