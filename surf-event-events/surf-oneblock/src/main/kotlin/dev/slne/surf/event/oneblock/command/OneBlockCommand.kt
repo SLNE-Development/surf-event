@@ -12,9 +12,15 @@ fun oneBlockCommand() = commandTree("oneblock") {
     withPermission(OneBlockPermissions.ONE_BLOCK_COMMAND)
 
     literalArgument("reload") {
+        withPermission(OneBlockPermissions.ONE_BLOCK_COMMAND_RELOAD)
         anyExecutor { sender, _ ->
             reload(sender)
         }
+    }
+
+    literalArgument("resetOneBlock") {
+        withPermission(OneBlockPermissions.ONE_BLOCK_COMMAND_RESET)
+        
     }
 }
 

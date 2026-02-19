@@ -24,4 +24,5 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
     compileOnly("de.oliver:FancyHolograms:2.7.0")
+    compileOnly("net.luckperms:api:5.4")
 }

@@ -13,4 +13,6 @@ object OneBlockPermissions : PermissionRegistry() {
     val PHASE_CHEST_COMMAND = create("$COMMAND_PREFIX.phaseChest")
     val PHASE_COMMAND = create("$COMMAND_PREFIX.phase")
     val ONE_BLOCK_COMMAND = create("$COMMAND_PREFIX.oneBlock")
+    val ONE_BLOCK_COMMAND_RELOAD = create("$COMMAND_PREFIX.oneBlock.reload")
+    val ONE_BLOCK_COMMAND_RESET = create("$COMMAND_PREFIX.oneBlock.reset")
 }
