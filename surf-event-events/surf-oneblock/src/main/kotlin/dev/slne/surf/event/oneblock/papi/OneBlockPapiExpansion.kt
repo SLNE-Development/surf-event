@@ -1,5 +1,6 @@
 package dev.slne.surf.event.oneblock.papi
 
+import dev.slne.surf.event.oneblock.papi.leaderboard.LeaderboardIsTopTenPlaceholder
 import dev.slne.surf.event.oneblock.papi.leaderboard.LeaderboardOwnPlacePlaceholder
 import dev.slne.surf.event.oneblock.papi.leaderboard.LeaderboardPlacePlaceholder
 import dev.slne.surf.event.oneblock.plugin
@@ -13,7 +14,8 @@ class OneBlockPapiExpansion : PapiExpansion(
         PlayerNamePlaceholder(),
         TotalBlocksPlaceholder(),
         LeaderboardPlacePlaceholder,
-        LeaderboardOwnPlacePlaceholder
+        LeaderboardOwnPlacePlaceholder,
+        LeaderboardIsTopTenPlaceholder
     ),
     "twisti, Ammo, red",
     plugin.pluginMeta.version

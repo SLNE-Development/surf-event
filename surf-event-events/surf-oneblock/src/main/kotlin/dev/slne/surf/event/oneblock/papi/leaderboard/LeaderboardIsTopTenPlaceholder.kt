@@ -10,11 +10,11 @@ object LeaderboardIsTopTenPlaceholder : PapiPlaceholder("isTopTen") {
         args: List<String>
     ): String {
         val uuid = player.uniqueId
-        val ownPlace = ValueHolder.getPlace(uuid) ?: return "false"
+        val ownPlace = ValueHolder.getPlace(uuid) ?: return "scoreboard02"
 
         if (ownPlace <= 10) {
-            return "true"
+            return "scoreboard01"
         }
-        return "false"
+        return "scoreboard02"
     }
 }
