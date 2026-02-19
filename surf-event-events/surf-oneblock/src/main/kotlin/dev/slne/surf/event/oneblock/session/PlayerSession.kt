@@ -1,10 +1,8 @@
 package dev.slne.surf.event.oneblock.session
 
-import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.regionDispatcher
 import com.github.shynixn.mccoroutine.folia.ticks
-import dev.slne.surf.event.oneblock.config.config
 import dev.slne.surf.event.oneblock.data.PlayerStateDTO
 import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.db.PlayerStateService
@@ -15,7 +13,6 @@ import dev.slne.surf.event.oneblock.progress.RollEngine
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
-import glm_.pow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.ComponentLike
@@ -58,77 +55,21 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         ProgressService.onBlockMined(player)
     }
 
-    suspend fun startRelocate(player: Player): RelocateResult {
-        if (isRelocating) {
-            return RelocateResult.ALREADY_RELOCATING
-        }
-
-        if (!isInRangeOfOneBlock(player)) {
-            return RelocateResult.NOT_IN_RANGE
-        }
-
-        if (isOnRelocationCooldown()) {
-            return RelocateResult.COOLDOWN
-        }
-
-        state.relocating = true
-        flushState()
-
-        return RelocateResult.START_RELOCATING
-    }
-
-    suspend fun finishRelocate(player: Player, loc: Location): RelocateResult {
+    suspend fun relocate(location: Location): RelocateResult {
         val island = IslandService.getIsland(uuid) ?: error("Island not found for player $uuid")
 
-        if (!isInRelocationRadius(player, loc)) {
-            return RelocateResult.TOO_FAR
-        }
-
-        return withContext(plugin.regionDispatcher(loc)) {
-            val block = loc.block
+        return withContext(plugin.regionDispatcher(location)) {
+            val block = location.block
             if (!block.isEmpty) {
                 return@withContext RelocateResult.LOCATION_OCCUPIED
             }
 
             block.blockData = BlockType.DIRT.createBlockData()
-            IslandManager.migrateOneBlock(block, uuid, island.oneBlock)
-            IslandService.updateOneBlockLocation(uuid, loc)
 
-            state.relocating = false
-            state.relocateTimestamp = System.currentTimeMillis()
-            flushState()
+            IslandManager.migrateOneBlock(block, uuid, island.oneBlock)
+            IslandService.updateOneBlockLocation(uuid, location)
 
             RelocateResult.RELOCATED
-        }
-    }
-
-    fun abortRelocate() {
-        if (isRelocating) {
-            state.relocating = false
-            state.relocateTimestamp = System.currentTimeMillis()
-            flushState()
-        }
-    }
-
-    private fun isOnRelocationCooldown(): Boolean {
-        val cooldown = config.relocate.relocateCooldownSeconds * 1000L
-        return System.currentTimeMillis() - state.relocateTimestamp < cooldown
-    }
-
-    suspend fun isInRangeOfOneBlock(player: Player): Boolean {
-        val island = IslandService.getIsland(uuid) ?: return false
-        return isInRelocationRadius(player, island.oneBlock)
-    }
-
-    private suspend fun isInRelocationRadius(player: Player, location: Location): Boolean {
-        if (player.world != location.world) {
-            return false
-        }
-
-        val maxDistanceSquared = config.relocate.relocateRadius pow 2
-
-        return withContext(plugin.entityDispatcher(player)) {
-            player.location.distanceSquared(location) <= maxDistanceSquared
         }
     }
 
@@ -138,9 +79,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
         }
     }
 
-    override fun close() {
-        abortRelocate()
-    }
+    override fun close() {}
 
     companion object {
         operator fun get(uuid: UUID): PlayerSession {
@@ -149,37 +88,9 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
     }
 
     enum class RelocateResult(message: SurfComponentBuilder.() -> Unit) : ComponentLike {
-        START_RELOCATING({
-            appendSuccessPrefix()
-            success("Du kannst nun einen neuen Ort für deinen OneBlock auswählen.")
-            appendNewPrefixedLine {
-                info("Wähle dazu einen Block aus und benutze ")
-                info("/relocate place <location>")
-            }
-        }),
         RELOCATED({
             appendSuccessPrefix()
             success("Dein OneBlock wurde erfolgreich umgezogen.")
-        }),
-        ABORTED({
-            appendSuccessPrefix()
-            success("Der Umzug wurde abgebrochen.")
-        }),
-        COOLDOWN({
-            appendErrorPrefix()
-            error("Du musst noch warten, bevor du erneut Umziehen kannst.")
-        }),
-        NOT_IN_RANGE({
-            appendErrorPrefix()
-            error("Du bist zu weit von deinem OneBlock entfernt.")
-        }),
-        TOO_FAR({
-            appendErrorPrefix()
-            error("Der ausgewählte Ort ist zu weit von dir entfernt.")
-        }),
-        ALREADY_RELOCATING({
-            appendErrorPrefix()
-            error("Du befindest dich bereits im Umzugsmodus.")
         }),
         LOCATION_OCCUPIED({
             appendErrorPrefix()
@@ -188,5 +99,7 @@ class PlayerSession(val uuid: UUID, private val state: PlayerStateDTO) : Closeab
 
         val message = buildText(message)
         override fun asComponent() = message
+
+        fun isSuccess() = this == RELOCATED
     }
 }

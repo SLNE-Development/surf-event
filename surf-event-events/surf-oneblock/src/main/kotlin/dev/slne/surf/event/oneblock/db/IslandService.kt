@@ -79,6 +79,10 @@ object IslandService {
         }
     }
 
+    fun anyNearIslands(location: Location): Boolean = all().any { island ->
+        island.oneBlock.distanceSquared(location) < 5
+    }
+
     suspend fun flushAll() {
         plugin.logger.info("Flushing ${islands.asMap().size} islands to database...")
         IslandRepository.saveAll(islands.asMap().values.toList())

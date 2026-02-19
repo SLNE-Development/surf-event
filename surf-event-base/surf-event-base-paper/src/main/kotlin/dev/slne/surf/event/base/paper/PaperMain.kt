@@ -1,6 +1,8 @@
 package dev.slne.surf.event.base.paper
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
+import dev.slne.surf.event.base.api.common.state.EventServerState
+import dev.slne.surf.event.base.core.access.eventServerAccess
 import dev.slne.surf.event.base.core.loader.redisLoader
 import dev.slne.surf.event.base.paper.command.eventServerCommand
 import dev.slne.surf.event.base.paper.config.EventServerConfigHolder
@@ -31,6 +33,7 @@ class PaperMain : SuspendingJavaPlugin() {
     }
 
     override suspend fun onDisableAsync() {
+        eventServerAccess.setEventServerState(EventServerState.UNKNOWN)
         redisLoader.disconnect()
     }
 
