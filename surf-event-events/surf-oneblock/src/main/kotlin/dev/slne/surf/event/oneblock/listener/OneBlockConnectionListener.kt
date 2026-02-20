@@ -1,15 +1,20 @@
 package dev.slne.surf.event.oneblock.listener
 
 import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent
+import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.event.oneblock.db.IslandService
 import dev.slne.surf.event.oneblock.island.IslandManager
 import dev.slne.surf.event.oneblock.messages.MessageManager
+import dev.slne.surf.event.oneblock.plugin
+import dev.slne.surf.event.oneblock.progress.phaseConfig
 import dev.slne.surf.event.oneblock.session.PlayerSessionManager
+import dev.slne.surf.stats.api.surfStatsApi
 import dev.slne.surf.surfapi.core.api.util.logger
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
 import kotlinx.coroutines.runBlocking
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -52,5 +57,26 @@ object OneBlockConnectionListener : Listener {
 
     fun shouldTeleportToIsland(playerId: UUID): Boolean {
         return tpToIsland.remove(playerId)
+    }
+
+    @EventHandler
+    fun onQuit(event: PlayerQuitEvent) {
+        val island = IslandService.getIsland(event.player.uniqueId) ?: return
+
+        plugin.launch {
+            surfStatsApi.saveCustomStat(
+                event.player.uniqueId,
+                event.player.name,
+                "minecraft:one_block_mined",
+                island.totalMined
+            )
+
+            surfStatsApi.saveCustomStat(
+                event.player.uniqueId,
+                event.player.name,
+                "minecraft:one_block_level",
+                phaseConfig.currentPhase(island.totalMined).weight.toLong()
+            )
+        }
     }
 }

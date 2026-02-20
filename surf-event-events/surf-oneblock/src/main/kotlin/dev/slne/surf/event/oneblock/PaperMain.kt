@@ -15,6 +15,7 @@ import dev.slne.surf.event.oneblock.listener.OneBlockConnectionListener
 import dev.slne.surf.event.oneblock.listener.OneBlockSaveListener
 import dev.slne.surf.event.oneblock.listener.OneBlockSpawnListener
 import dev.slne.surf.event.oneblock.papi.OneBlockPapiExpansion
+import dev.slne.surf.event.oneblock.progress.ProgressService
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.bukkit.api.hook.papi.papiHook
@@ -56,6 +57,7 @@ class PaperMain : SuspendingJavaPlugin() {
     }
 
     override suspend fun onDisableAsync() {
+        ProgressService.flushStats()
         IslandManager.saveIdx()
         IslandService.flushAll()
 
