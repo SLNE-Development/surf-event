@@ -53,12 +53,18 @@ data class PhaseConfig(
     }
 
     @ConfigSerializable
+    data class ParentEntry(
+        val id: String,
+        val weight: Double = 1.0
+    )
+
+    @ConfigSerializable
     data class Phase(
         val id: String,
         val displayName: String = id.replaceFirstChar { it.uppercaseChar() }.replace('_', ' '),
         val startsAt: Int,
         val weight: Int,
-        val parents: List<String>,
+        val parents: List<ParentEntry>,
         val blocks: List<BlockEntry>,
         val entities: List<EntityEntry>
     ) {
@@ -91,18 +97,11 @@ data class PhaseConfig(
             val parentBudget = ownTotal * parentShare
             var remainingBudget = parentBudget
 
-            var levelFactor = 1.0
-            var levelFactorSum = 0.0
-            val levelFactors = ArrayList<Double>(parents.size)
-            for (i in parents.indices) {
-                levelFactors += levelFactor
-                levelFactorSum += levelFactor
-                levelFactor *= PARENT_DECAY
-            }
+            val levelFactorSum = parents.sumOf { it.weight }
 
-            for ((idx, parentId) in parents.withIndex()) {
+            for (parentEntry in parents) {
                 if (remainingBudget <= 1e-9) break
-                val parent = config.findById(parentId) ?: continue
+                val parent = config.findById(parentEntry.id) ?: continue
                 val parentBlocks = parent.blocks
                 if (parentBlocks.isEmpty()) continue
 
@@ -110,7 +109,7 @@ data class PhaseConfig(
                 if (parentRawTotal <= 0.0) continue
 
                 val shareForThisParent = if (levelFactorSum > 0.0)
-                    parentBudget * (levelFactors[idx] / levelFactorSum)
+                    parentBudget * (parentEntry.weight / levelFactorSum)
                 else 0.0
 
                 val assigned = shareForThisParent.coerceAtMost(remainingBudget)
@@ -126,7 +125,7 @@ data class PhaseConfig(
                 remainingBudget -= assigned
             }
 
-            if (choices.isEmpty()) {
+            if (choices.isEmpty) {
                 choices += WeightedBlock.dirt()
             }
 
@@ -148,18 +147,11 @@ data class PhaseConfig(
             val parentBudget = (if (ownTotal > 0.0) ownTotal else 1.0) * parentShare
             var remainingBudget = parentBudget
 
-            var levelFactor = 1.0
-            var levelFactorSum = 0.0
-            val levelFactors = ArrayList<Double>(parents.size)
-            for (i in parents.indices) {
-                levelFactors += levelFactor
-                levelFactorSum += levelFactor
-                levelFactor *= PARENT_DECAY
-            }
+            val levelFactorSum = parents.sumOf { it.weight }
 
-            for ((idx, parentId) in parents.withIndex()) {
+            for (parentEntry in parents) {
                 if (remainingBudget <= 1e-9) break
-                val parent = config.findById(parentId) ?: continue
+                val parent = config.findById(parentEntry.id) ?: continue
                 val parentEntities = parent.entities
                 if (parentEntities.isEmpty()) continue
 
@@ -167,7 +159,7 @@ data class PhaseConfig(
                 if (parentRawTotal <= 0.0) continue
 
                 val shareForThisParent = if (levelFactorSum > 0.0)
-                    parentBudget * (levelFactors[idx] / levelFactorSum)
+                    parentBudget * (parentEntry.weight / levelFactorSum)
                 else 0.0
 
                 val assigned = shareForThisParent.coerceAtMost(remainingBudget)

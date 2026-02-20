@@ -24,7 +24,7 @@ val defaultPhases = listOf(
         id = "early_mining",
         startsAt = 150,
         weight = 2,
-        parents = listOf("start_plains"),
+        parents = listOf(ParentEntry("start_plains")),
         blocks = listOf(
             BlockEntry(data = "minecraft:stone", weight = 50),
             BlockEntry(data = "minecraft:coal_ore", weight = 20),
@@ -40,7 +40,7 @@ val defaultPhases = listOf(
         id = "early_caves",
         startsAt = 350,
         weight = 2,
-        parents = listOf("early_mining"),
+        parents = listOf(ParentEntry("early_mining")),
         blocks = listOf(
             BlockEntry(data = "minecraft:stone", weight = 40),
             BlockEntry(data = "minecraft:coal_ore", weight = 25),
@@ -57,7 +57,7 @@ val defaultPhases = listOf(
         id = "iron_age",
         startsAt = 700,
         weight = 3,
-        parents = listOf("early_caves"),
+        parents = listOf(ParentEntry("early_caves")),
         blocks = listOf(
             BlockEntry(data = "minecraft:stone", weight = 35),
             BlockEntry(data = "minecraft:iron_ore", weight = 30),
@@ -74,7 +74,7 @@ val defaultPhases = listOf(
         id = "abandoned_mineshaft",
         startsAt = 1100,
         weight = 3,
-        parents = listOf("iron_age"),
+        parents = listOf(ParentEntry("iron_age")),
         blocks = listOf(
             BlockEntry(data = "minecraft:oak_planks", weight = 20),
             BlockEntry(data = "minecraft:oak_log", weight = 15),
@@ -91,7 +91,7 @@ val defaultPhases = listOf(
         id = "deep_caves",
         startsAt = 1600,
         weight = 4,
-        parents = listOf("iron_age"),
+        parents = listOf(ParentEntry("iron_age")),
         blocks = listOf(
             BlockEntry(data = "minecraft:deepslate", weight = 40),
             BlockEntry(data = "minecraft:iron_ore", weight = 20),
@@ -108,7 +108,7 @@ val defaultPhases = listOf(
         id = "redstone_labs",
         startsAt = 2200,
         weight = 4,
-        parents = listOf("deep_caves"),
+        parents = listOf(ParentEntry("deep_caves")),
         blocks = listOf(
             BlockEntry(data = "minecraft:redstone_ore", weight = 35),
             BlockEntry(data = "minecraft:deepslate", weight = 30),
@@ -125,7 +125,7 @@ val defaultPhases = listOf(
         id = "lava_depths",
         startsAt = 3000,
         weight = 5,
-        parents = listOf("deep_caves"),
+        parents = listOf(ParentEntry("deep_caves")),
         blocks = listOf(
             BlockEntry(data = "minecraft:basalt", weight = 30),
             BlockEntry(data = "minecraft:magma_block", weight = 15),
@@ -141,7 +141,7 @@ val defaultPhases = listOf(
         id = "dripstone_caves",
         startsAt = 3600,
         weight = 5,
-        parents = listOf("deep_caves"),
+        parents = listOf(ParentEntry("deep_caves")),
         blocks = listOf(
             BlockEntry(data = "minecraft:dripstone_block", weight = 40),
             BlockEntry(data = "minecraft:pointed_dripstone", weight = 20),
@@ -157,7 +157,7 @@ val defaultPhases = listOf(
         id = "lush_caves",
         startsAt = 4200,
         weight = 5,
-        parents = listOf("deep_caves"),
+        parents = listOf(ParentEntry("deep_caves")),
         blocks = listOf(
             BlockEntry(data = "minecraft:moss_block", weight = 30),
             BlockEntry(data = "minecraft:clay", weight = 25),
@@ -173,7 +173,7 @@ val defaultPhases = listOf(
         id = "nether_entry",
         startsAt = 5000,
         weight = 6,
-        parents = listOf("lava_depths"),
+        parents = listOf(ParentEntry("lava_depths")),
         blocks = listOf(
             BlockEntry(data = "minecraft:netherrack", weight = 60),
             BlockEntry(data = "minecraft:nether_quartz_ore", weight = 20),
@@ -189,7 +189,7 @@ val defaultPhases = listOf(
         id = "nether_fortress",
         startsAt = 5800,
         weight = 7,
-        parents = listOf("nether_entry"),
+        parents = listOf(ParentEntry("nether_entry")),
         blocks = listOf(
             BlockEntry(data = "minecraft:nether_bricks", weight = 40),
             BlockEntry(data = "minecraft:soul_sand", weight = 20),
@@ -205,7 +205,7 @@ val defaultPhases = listOf(
         id = "crimson_forest",
         startsAt = 6500,
         weight = 7,
-        parents = listOf("nether_entry"),
+        parents = listOf(ParentEntry("nether_entry")),
         blocks = listOf(
             BlockEntry(data = "minecraft:crimson_nylium", weight = 30),
             BlockEntry(data = "minecraft:crimson_stem", weight = 25),
@@ -221,7 +221,7 @@ val defaultPhases = listOf(
         id = "warped_forest",
         startsAt = 7200,
         weight = 7,
-        parents = listOf("nether_entry"),
+        parents = listOf(ParentEntry("nether_entry")),
         blocks = listOf(
             BlockEntry(data = "minecraft:warped_nylium", weight = 30),
             BlockEntry(data = "minecraft:warped_stem", weight = 25),
@@ -237,7 +237,7 @@ val defaultPhases = listOf(
         id = "basalt_deltas",
         startsAt = 7800,
         weight = 8,
-        parents = listOf("nether_entry"),
+        parents = listOf(ParentEntry("nether_entry")),
         blocks = listOf(
             BlockEntry(data = "minecraft:basalt", weight = 50),
             BlockEntry(data = "minecraft:blackstone", weight = 30),
@@ -252,7 +252,7 @@ val defaultPhases = listOf(
         id = "diamond_depths",
         startsAt = 9000,
         weight = 8,
-        parents = listOf("deep_caves"),
+        parents = listOf(ParentEntry("deep_caves")),
         blocks = listOf(
             BlockEntry(data = "minecraft:deepslate", weight = 50),
             BlockEntry(data = "minecraft:diamond_ore", weight = 15),
@@ -269,7 +269,7 @@ val defaultPhases = listOf(
         id = "ancient_city",
         startsAt = 10000,
         weight = 9,
-        parents = listOf("diamond_depths"),
+        parents = listOf(ParentEntry("diamond_depths")),
         blocks = listOf(
             BlockEntry(data = "minecraft:sculk", weight = 40),
             BlockEntry(data = "minecraft:sculk_catalyst", weight = 10),
@@ -286,7 +286,7 @@ val defaultPhases = listOf(
         id = "stronghold",
         startsAt = 11000,
         weight = 9,
-        parents = listOf("diamond_depths"),
+        parents = listOf(ParentEntry("diamond_depths")),
         blocks = listOf(
             BlockEntry(data = "minecraft:stone_bricks", weight = 40),
             BlockEntry(data = "minecraft:cracked_stone_bricks", weight = 15),
@@ -303,7 +303,7 @@ val defaultPhases = listOf(
         id = "the_end",
         startsAt = 13000,
         weight = 10,
-        parents = listOf("stronghold"),
+        parents = listOf(ParentEntry("stronghold")),
         blocks = listOf(
             BlockEntry(data = "minecraft:end_stone", weight = 70),
             BlockEntry(data = "minecraft:obsidian", weight = 20),
@@ -318,7 +318,7 @@ val defaultPhases = listOf(
         id = "end_cities",
         startsAt = 15000,
         weight = 11,
-        parents = listOf("the_end"),
+        parents = listOf(ParentEntry("the_end")),
         blocks = listOf(
             BlockEntry(data = "minecraft:purpur_block", weight = 40),
             BlockEntry(data = "minecraft:end_stone", weight = 30),
@@ -335,7 +335,7 @@ val defaultPhases = listOf(
         id = "overworld_chaos",
         startsAt = 17000,
         weight = 12,
-        parents = listOf("the_end"),
+        parents = listOf(ParentEntry("the_end")),
         blocks = listOf(
             BlockEntry(data = "minecraft:stone", weight = 30),
             BlockEntry(data = "minecraft:deepslate", weight = 30),
@@ -352,7 +352,7 @@ val defaultPhases = listOf(
         id = "event_finale",
         startsAt = 20000,
         weight = 13,
-        parents = listOf("overworld_chaos"),
+        parents = listOf(ParentEntry("overworld_chaos")),
         blocks = listOf(
             BlockEntry(data = "minecraft:ancient_debris", weight = 10),
             BlockEntry(data = "minecraft:netherite_block", weight = 1),

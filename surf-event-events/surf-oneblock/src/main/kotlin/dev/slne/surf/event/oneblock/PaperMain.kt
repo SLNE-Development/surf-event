@@ -15,12 +15,15 @@ import dev.slne.surf.event.oneblock.listener.OneBlockConnectionListener
 import dev.slne.surf.event.oneblock.listener.OneBlockSaveListener
 import dev.slne.surf.event.oneblock.listener.OneBlockSpawnListener
 import dev.slne.surf.event.oneblock.papi.OneBlockPapiExpansion
+import dev.slne.surf.event.oneblock.progress.ConfigMigration
 import dev.slne.surf.event.oneblock.progress.ProgressService
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.bukkit.api.hook.papi.papiHook
 import org.bukkit.World
 import org.bukkit.plugin.java.JavaPlugin
+import org.spongepowered.configurate.transformation.ConfigurationTransformation
+import kotlin.io.path.div
 
 class PaperMain : SuspendingJavaPlugin() {
     private lateinit var databaseApi: DatabaseApi
@@ -34,6 +37,8 @@ class PaperMain : SuspendingJavaPlugin() {
                 PlayerStateTable
             )
         }
+
+        ConfigMigration.upgradeFile(dataPath / "phases.yml")
     }
 
     override fun onEnable() {
