@@ -207,8 +207,13 @@ data class PhaseConfig(
         private val manager: SpongeConfigManager<PhaseConfig>
 
         init {
-            surfConfigApi.createSpongeYmlConfig<PhaseConfig>(plugin.dataPath, "phases.yml")
-            manager = surfConfigApi.getSpongeConfigManagerForConfig(PhaseConfig::class.java)
+            try {
+                surfConfigApi.createSpongeYmlConfig<PhaseConfig>(plugin.dataPath, "phases.yml")
+                manager = surfConfigApi.getSpongeConfigManagerForConfig(PhaseConfig::class.java)
+            } catch (e: Throwable) {
+                plugin.componentLogger.error("Failed to load phase config!", e)
+                throw e
+            }
         }
 
         val config: PhaseConfig

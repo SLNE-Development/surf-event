@@ -28,21 +28,25 @@ object ConfigMigration {
             ) { _, parentsNode ->
                 if (!parentsNode.isList) return@addAction null
 
-                val children = parentsNode.childrenList()
-                for (i in children.indices) {
-                    val entry = parentsNode.node(i)
+                val entries: List<Pair<String, Double>> =
+                    parentsNode.childrenList().mapNotNull { child ->
+                        child.string?.let { return@mapNotNull it to 1.0 }
 
-                    val id = entry.string
-                    if (id != null) {
-                        entry.set(null)
-                        entry.node("id").set(id)
-                        entry.node("weight").set(1.0)
-                    } else {
-                        if (!entry.node("weight").virtual()) continue
-                        if (!entry.node("id").virtual() && entry.node("weight").virtual()) {
-                            entry.node("weight").set(1.0)
+                        val id = child.node("id").string
+                        if (id != null) {
+                            val weight = child.node("weight").getDouble(1.0)
+                            return@mapNotNull id to weight
                         }
+
+                        null
                     }
+
+                parentsNode.set(null)
+
+                for ((i, entry) in entries.withIndex()) {
+                    val (id, weight) = entry
+                    parentsNode.node(i).node("id").set(id)
+                    parentsNode.node(i).node("weight").set(weight)
                 }
 
                 null

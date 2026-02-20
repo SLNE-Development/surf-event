@@ -16,13 +16,13 @@ import dev.slne.surf.event.oneblock.listener.OneBlockSaveListener
 import dev.slne.surf.event.oneblock.listener.OneBlockSpawnListener
 import dev.slne.surf.event.oneblock.papi.OneBlockPapiExpansion
 import dev.slne.surf.event.oneblock.progress.ConfigMigration
+import dev.slne.surf.event.oneblock.progress.PhaseConfig
 import dev.slne.surf.event.oneblock.progress.ProgressService
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import dev.slne.surf.surfapi.bukkit.api.extensions.server
 import dev.slne.surf.surfapi.bukkit.api.hook.papi.papiHook
 import org.bukkit.World
 import org.bukkit.plugin.java.JavaPlugin
-import org.spongepowered.configurate.transformation.ConfigurationTransformation
 import kotlin.io.path.div
 
 class PaperMain : SuspendingJavaPlugin() {
@@ -42,6 +42,7 @@ class PaperMain : SuspendingJavaPlugin() {
     }
 
     override fun onEnable() {
+        PhaseConfig
         OneBlockConnectionListener.register()
         OneBlockBlockListener.register()
         OneBlockSaveListener.register()
