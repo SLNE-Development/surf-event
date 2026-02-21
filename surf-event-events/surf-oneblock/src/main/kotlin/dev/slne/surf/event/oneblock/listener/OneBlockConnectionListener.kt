@@ -12,11 +12,13 @@ import dev.slne.surf.stats.api.surfStatsApi
 import dev.slne.surf.surfapi.core.api.util.logger
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("UnstableApiUsage")
 object OneBlockConnectionListener : Listener {
@@ -29,14 +31,15 @@ object OneBlockConnectionListener : Listener {
 
         try {
             runBlocking {
-                PlayerSessionManager.createSession(playerId)
-
-                if (!IslandService.hasIsland(playerId)) {
-                    val created = IslandManager.createIslandForPlayer(playerId)
-                    if (!created) {
-                        event.connection.disconnect(MessageManager.unableToCreateIslandDisconnect)
-                    } else {
-                        tpToIsland.add(playerId)
+                withTimeout(30.seconds) {
+                    PlayerSessionManager.createSession(playerId)
+                    if (!IslandService.hasIsland(playerId)) {
+                        val created = IslandManager.createIslandForPlayer(playerId)
+                        if (!created) {
+                            event.connection.disconnect(MessageManager.unableToCreateIslandDisconnect)
+                        } else {
+                            tpToIsland.add(playerId)
+                        }
                     }
                 }
             }

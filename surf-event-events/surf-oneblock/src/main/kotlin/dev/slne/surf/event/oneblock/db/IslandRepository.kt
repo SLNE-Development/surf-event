@@ -44,19 +44,21 @@ object IslandRepository {
     }
 
     suspend fun findAll() = suspendTransaction {
-        IslandTable.selectAll().map { row ->
-            IslandDTO(
-                owner = row[IslandTable.ownerUuid],
-                oneBlock = Location(
-                    Bukkit.getWorld(row[IslandTable.oneBlockWorld]) ?: error("World not found"),
-                    row[IslandTable.oneBlockX],
-                    row[IslandTable.oneBlockY],
-                    row[IslandTable.oneBlockZ],
-                ),
-                totalMined = row[IslandTable.totalMined]
-            )
-        }.toList()
+        IslandTable.selectAll()
+            .map { row ->
+                IslandDTO(
+                    owner = row[IslandTable.ownerUuid],
+                    oneBlock = Location(
+                        Bukkit.getWorld(row[IslandTable.oneBlockWorld]) ?: error("World not found"),
+                        row[IslandTable.oneBlockX],
+                        row[IslandTable.oneBlockY],
+                        row[IslandTable.oneBlockZ],
+                    ),
+                    totalMined = row[IslandTable.totalMined]
+                )
+            }.toList()
     }
+
 
     suspend fun saveAll(dtos: List<IslandDTO>) = suspendTransaction {
         IslandTable.batchUpsert(dtos, shouldReturnGeneratedValues = false) { dto ->

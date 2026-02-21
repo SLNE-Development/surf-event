@@ -1,7 +1,6 @@
 package dev.slne.surf.event.oneblock
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
-import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.database.DatabaseApi
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.SchemaUtils
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
@@ -41,7 +40,7 @@ class PaperMain : SuspendingJavaPlugin() {
         ConfigMigration.upgradeFile(dataPath / "phases.yml")
     }
 
-    override fun onEnable() {
+    override suspend fun onEnableAsync() {
         PhaseConfig
         OneBlockConnectionListener.register()
         OneBlockBlockListener.register()
@@ -57,9 +56,7 @@ class PaperMain : SuspendingJavaPlugin() {
         IslandManager.loadIdx()
         papiHook.register(OneBlockPapiExpansion())
 
-        plugin.launch {
-            IslandService.fetchIslands()
-        }
+        IslandService.fetchIslands()
     }
 
     override suspend fun onDisableAsync() {
