@@ -1,7 +1,7 @@
-import dev.slne.surf.surfapi.gradle.util.registerSoft
+import dev.slne.surf.api.gradle.util.registerSoft
 
 plugins {
-    id("dev.slne.surf.surfapi.gradle.paper-plugin")
+    id("dev.slne.surf.api.gradle.paper-plugin")
 }
 
 surfPaperPluginApi {
@@ -20,7 +20,6 @@ surfPaperPluginApi {
 }
 
 dependencies {
-    api(project(":surf-event-base:surf-event-base-core"))
-    implementation("dev.slne.surf.tab:surf-tab-api:1.21.11-1.0.2-SNAPSHOT")
-    compileOnly("dev.slne.surf.settings:surf-settings-api:1.21.11-2.0.1-SNAPSHOT")
+    api(projects.surfEventBase.surfEventBaseCore)
+    compileOnly("dev.slne.surf.settings:surf-settings-api:+")
 }

@@ -1,6 +1,6 @@
 package dev.slne.surf.event.base.paper.permission
 
-import dev.slne.surf.surfapi.bukkit.api.permission.PermissionRegistry
+import dev.slne.surf.api.paper.permission.PermissionRegistry
 
 object PermissionRegistry : PermissionRegistry() {
     const val PREFIX = "surf.event"

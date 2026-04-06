@@ -5,15 +5,16 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.paper.inventory.framework.open
 import dev.slne.surf.event.base.paper.eventServerConfig
 import dev.slne.surf.event.base.paper.permission.PermissionRegistry
 import dev.slne.surf.event.base.paper.plugin
+import dev.slne.surf.event.base.paper.settings.PlayerVisibilityService
 import dev.slne.surf.event.base.paper.settings.PlayerVisibilityState
 import dev.slne.surf.event.base.paper.settings.command.argument.playerVisibilityState
-import dev.slne.surf.event.base.paper.settings.menu.showPlayerVisibilityMenu
-import dev.slne.surf.event.base.paper.settings.playerVisibilityService
+import dev.slne.surf.event.base.paper.settings.menu.playerVisibilityView
 import dev.slne.surf.event.base.paper.settings.settingsHook
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun playerVisibilityCommand() = commandTree("playervisibility") {
     withPermission(PermissionRegistry.COMMAND_PLAYER_VISIBILITY)
@@ -28,7 +29,7 @@ fun playerVisibilityCommand() = commandTree("playervisibility") {
             return@playerExecutor
         }
 
-        showPlayerVisibilityMenu(player)
+        playerVisibilityView().open(player)
     }
 
     literalArgument("state") {
@@ -73,7 +74,7 @@ fun playerVisibilityCommand() = commandTree("playervisibility") {
 
                 plugin.launch {
                     settingsHook.setState(player.uniqueId, state)
-                    playerVisibilityService.refreshState(player)
+                    PlayerVisibilityService.refreshState(player)
 
                     player.sendText {
                         appendSuccessPrefix()

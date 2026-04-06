@@ -1,9 +1,9 @@
 package dev.slne.surf.event.base.velocity.command
 
 import dev.jorel.commandapi.kotlindsl.*
+import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.event.base.api.common.state.EventServerState
 import dev.slne.surf.event.base.core.access.eventServerAccess
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun eventServerStateCommand() = commandTree("eventserverstate") {
     withPermission("surf.event.base.command.eventserverstate")

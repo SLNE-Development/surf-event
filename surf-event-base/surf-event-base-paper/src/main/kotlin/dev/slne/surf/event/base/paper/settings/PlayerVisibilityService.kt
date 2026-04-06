@@ -1,18 +1,13 @@
 package dev.slne.surf.event.base.paper.settings
 
-import dev.slne.surf.event.base.core.loader.redisApi
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.paper.util.forEachPlayer
 import dev.slne.surf.event.base.paper.eventServerConfig
 import dev.slne.surf.event.base.paper.permission.PermissionRegistry
 import dev.slne.surf.event.base.paper.plugin
-import dev.slne.surf.surfapi.bukkit.api.util.forEachPlayer
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
-import dev.slne.surf.tab.api.redis.TabEntryUpdateRedisEvent
 import org.bukkit.entity.Player
 
-val playerVisibilityService = PlayerVisibilityService()
-
-class PlayerVisibilityService {
-
+object PlayerVisibilityService {
     fun refreshState(player: Player) {
         if (!eventServerConfig.playerVisibilityEnabled) {
             return
@@ -83,7 +78,6 @@ class PlayerVisibilityService {
         }
 
         player.showPlayer(plugin, target)
-        redisApi.publishEvent(TabEntryUpdateRedisEvent(target.uniqueId))
     }
 
     private fun hidePlayer(player: Player, target: Player) {

@@ -5,8 +5,8 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.event.base.paper.settings.PlayerVisibilityState
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class PlayerVisibilityStateArgument(nodeName: String) :
     CustomArgument<PlayerVisibilityState, String>(StringArgument(nodeName), { info ->

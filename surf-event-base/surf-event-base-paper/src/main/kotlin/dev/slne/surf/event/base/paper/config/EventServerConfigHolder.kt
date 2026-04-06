@@ -1,8 +1,8 @@
 package dev.slne.surf.event.base.paper.config
 
+import dev.slne.surf.api.core.config.manager.SpongeConfigManager
+import dev.slne.surf.api.core.config.surfConfigApi
 import dev.slne.surf.event.base.paper.plugin
-import dev.slne.surf.surfapi.core.api.config.manager.SpongeConfigManager
-import dev.slne.surf.surfapi.core.api.config.surfConfigApi
 
 class EventServerConfigHolder {
     private val configManager: SpongeConfigManager<EventServerConfig>
