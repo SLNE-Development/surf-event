@@ -4,6 +4,8 @@ import dev.slne.surf.api.paper.util.namespacedKey
 import dev.slne.surf.event.anarchy.equipment.EquipmentManager
 import dev.slne.surf.event.anarchy.kills.KillDisplayManager
 import dev.slne.surf.event.anarchy.permission.PermissionList
+import io.papermc.paper.ban.BanListType
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
@@ -29,6 +31,7 @@ object SpectatingManager {
         player.persistentDataContainer.remove(spectatorKey)
         player.gameMode = GameMode.SURVIVAL
         player.teleportAsync(player.world.spawnLocation)
+        Bukkit.getBanList(BanListType.PROFILE).pardon(player.playerProfile)
 
         player.inventory.clear()
 

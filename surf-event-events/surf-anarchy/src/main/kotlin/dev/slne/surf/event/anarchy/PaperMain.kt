@@ -5,6 +5,7 @@ import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.event.anarchy.equipment.EquipmentListener
 import dev.slne.surf.event.anarchy.equipment.equipmentCommand
 import dev.slne.surf.event.anarchy.kills.KillDisplayListener
+import dev.slne.surf.event.anarchy.kills.combatlog.CombatLogListener
 import dev.slne.surf.event.anarchy.spectating.SpectatingListener
 import dev.slne.surf.event.anarchy.spectating.spectatingCommand
 import org.bukkit.plugin.java.JavaPlugin
@@ -21,6 +22,8 @@ class PaperMain : SuspendingJavaPlugin() {
         EquipmentListener.register()
         KillDisplayListener.register()
         SpectatingListener.register()
+        CombatLogListener.register()
+        CombatLogListener.createActionbar()
     }
 
     override suspend fun onDisableAsync() {

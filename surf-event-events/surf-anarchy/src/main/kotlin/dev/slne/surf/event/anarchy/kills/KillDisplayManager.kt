@@ -18,8 +18,7 @@ object KillDisplayManager {
         player.persistentDataContainer.set(killsKey, PersistentDataType.INTEGER, kills)
 
     fun incrementKills(player: Player) {
-        val kills = getKills(player) ?: 0
-        setKills(player, kills + 1)
+        setKills(player, getKills(player) + 1)
     }
 
     fun updateNewPlayerForAll(player: Player) {
@@ -27,8 +26,8 @@ object KillDisplayManager {
             SurfNametagApi.setNametag(player.uniqueId, it.uniqueId, buildText {
                 append(it.getPrefixedName())
                 appendNewline()
-                variableValue(getKills(it))
-                primary(" Kills")
+                white(getKills(it))
+                info(" Getötete Spieler")
             })
         }
     }
@@ -38,8 +37,8 @@ object KillDisplayManager {
             SurfNametagApi.setNametag(player.uniqueId, it.uniqueId, buildText {
                 append(player.getPrefixedName())
                 appendNewline()
-                variableValue(getKills(player))
-                primary(" Kills")
+                white(getKills(player))
+                info(" Getötete Spieler")
             })
         }
     }
@@ -49,8 +48,8 @@ object KillDisplayManager {
             SurfNametagApi.setNametag(it.uniqueId, player.uniqueId, buildText {
                 append(it.getPrefixedName())
                 appendNewline()
-                variableValue(getKills(it))
-                primary(" Kills")
+                white(getKills(it))
+                info(" Getötete Spieler")
             })
         }
     }
