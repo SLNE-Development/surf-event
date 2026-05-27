@@ -24,9 +24,9 @@ object KillDisplayManager {
     fun updateNewPlayerForAll(player: Player) {
         Bukkit.getOnlinePlayers().filter { it.canSee(player) }.forEach {
             SurfNametagApi.setNametag(player.uniqueId, it.uniqueId, buildText {
-                append(it.getPrefixedName())
+                append(player.getPrefixedName())
                 appendNewline()
-                white(getKills(it))
+                white(getKills(player))
                 info(" Getötete Spieler")
             })
         }

@@ -13,6 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.time.OffsetDateTime
 import java.util.*
@@ -36,6 +37,15 @@ object CombatLogListener : Listener {
 
         damageCache.put(damaged.uniqueId, DamageInfo(damager.uniqueId, OffsetDateTime.now()))
         damageCache.put(damager.uniqueId, DamageInfo(damaged.uniqueId, OffsetDateTime.now()))
+    }
+
+    @EventHandler
+    fun onDeath(event: PlayerDeathEvent) {
+        val player = event.player
+        val damageInfo = damageCache.getIfPresent(player.uniqueId) ?: return
+
+        damageCache.invalidate(damageInfo.damager)
+        damageCache.invalidate(player.uniqueId)
     }
 
     @EventHandler
