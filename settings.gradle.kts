@@ -31,3 +31,5 @@ plugins {
 }
 
 
+
+include("surf-event-events:surf-anarchy")
