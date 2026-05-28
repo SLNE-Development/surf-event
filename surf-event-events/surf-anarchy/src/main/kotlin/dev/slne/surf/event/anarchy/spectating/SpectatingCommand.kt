@@ -6,7 +6,7 @@ import dev.slne.surf.event.anarchy.permission.PermissionList
 import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import org.bukkit.entity.Player
 
-fun spectatingCommand() = commandTree("spectating") {
+fun spectatingCommand() = commandTree("spectator") {
     withPermission(PermissionList.SPECTATING_COMMAND)
 
     literalArgument("reset") {

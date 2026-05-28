@@ -81,10 +81,12 @@ object EquipmentManager {
         val meta = itemMeta ?: return
 
         meta.isUnbreakable = true
+        meta.setEnchantmentGlintOverride(false)
 
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
         meta.addEnchant(Enchantment.VANISHING_CURSE, 1, true)
-        meta.setEnchantable(1)
         meta.persistentDataContainer.set(equipmentItemKey, PersistentDataType.BOOLEAN, true)
+
+        itemMeta = meta
     }
 }

@@ -76,7 +76,7 @@ object KillDisplayListener : Listener {
         }
 
         player.location.world.strikeLightningEffect(player.location)
-        player.location.world.playSound(player.location, Sound.ENTITY_WITHER_SPAWN, 0.2f, 1.4f)
+        player.location.world.playSound(player.location, Sound.ENTITY_WITHER_SPAWN, 0.2f, 1f)
 
         if (killer == null) {
             return
