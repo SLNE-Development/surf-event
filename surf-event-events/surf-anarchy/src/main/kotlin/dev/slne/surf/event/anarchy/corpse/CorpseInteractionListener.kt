@@ -64,7 +64,7 @@ object CorpseInteractionListener : Listener {
             stand.remove()
             event.player.sendText {
                 appendAnarchyPrefix()
-                success("Die Leiche wurde zerstört, da sie leer ist.")
+                success("Die Leiche ist verschwunden...")
             }
         } else {
             stand.persistentDataContainer.set(
