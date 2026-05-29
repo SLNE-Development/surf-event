@@ -9,7 +9,6 @@ import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
 import dev.slne.surf.api.core.util.random
 import dev.slne.surf.api.paper.util.getPrefixedName
 import dev.slne.surf.event.anarchy.permission.PermissionList
-import dev.slne.surf.event.anarchy.plugin
 import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import org.bukkit.Bukkit
 import org.bukkit.entity.ArmorStand
@@ -88,8 +87,9 @@ object CorpseInteractionListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     fun onInventoryClose(event: InventoryCloseEvent) {
         val session = sessionByInventory[event.inventory] ?: return
+        val remainingViewers = event.inventory.viewers.size - 1
 
-        if (event.inventory.viewers.isNotEmpty()) {
+        if (remainingViewers > 0) {
             return
         }
 
@@ -121,8 +121,14 @@ object CorpseInteractionListener : Listener {
         sessionByInventory.remove(session.inventory)
         sessionByStand.remove(session.standUuid)
 
+        sessionByInventory.remove(session.inventory)
+        sessionByStand.remove(session.standUuid)
+
+        val remaining = session.inventory.contents
+            .filterNotNull()
+            .filter { !it.isEmpty }
+
         val stand = findStand(session.standUuid) ?: return
-        val remaining = session.inventory.contents.filterNotNull().filter { !it.isEmpty }
 
         if (remaining.isEmpty()) {
             CorpseManager.corpseOwners.remove(stand.uniqueId)
@@ -137,10 +143,7 @@ object CorpseInteractionListener : Listener {
     }
 
     private fun findStand(uuid: UUID): ArmorStand? =
-        plugin.server.worlds
-            .flatMap { it.entities }
-            .filterIsInstance<ArmorStand>()
-            .firstOrNull { it.uniqueId == uuid }
+        Bukkit.getEntity(uuid) as? ArmorStand
 
     private const val MAX_MITIGATIONS = 5
 
@@ -151,13 +154,15 @@ object CorpseInteractionListener : Listener {
             dupeMitigations.asMap().filter { it.value == player.uniqueId }.size
 
         Bukkit.broadcast(buildText {
-            appendAnarchyPrefix()
+            darkSpacer(">>")
+            darkRed(" AntiCheat")
+            darkSpacer(" | ")
             append(player.getPrefixedName())
             info(" failed ")
             white("Dupe *")
-            spacer("(")
+            info("(")
             white("Type A")
-            spacer(")")
+            info(")")
             white("*")
             info(" [")
             darkRed(summedMitigations)
