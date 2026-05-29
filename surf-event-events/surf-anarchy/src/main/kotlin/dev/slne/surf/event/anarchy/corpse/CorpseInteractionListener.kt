@@ -4,6 +4,7 @@ import com.jeff_media.morepersistentdatatypes.DataType
 import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
+import dev.slne.surf.event.anarchy.permission.PermissionList
 import dev.slne.surf.event.anarchy.plugin
 import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import org.bukkit.Bukkit
@@ -11,6 +12,7 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.inventory.Inventory
 import java.util.*
@@ -28,6 +30,14 @@ object CorpseInteractionListener : Listener {
 
         event.isCancelled = true
 
+        if (event.player.openInventory.topInventory.type != InventoryType.CRAFTING) {
+            Bukkit.broadcast(buildText {
+                appendAnarchyPrefix()
+                error("${event.player.name} may tried to dupe!")
+            }, PermissionList.DUPE_NOTIFY)
+            return
+        }
+        
         val pdc = stand.persistentDataContainer
         val stored = pdc.get(CorpseManager.KEY_INVENTORY, DataType.ITEM_STACK_ARRAY)
         val ownerName = pdc.getOrDefault(CorpseManager.KEY_OWNER, DataType.STRING, "#unknown")
