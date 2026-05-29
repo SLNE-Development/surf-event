@@ -6,7 +6,7 @@ object PermissionList : PermissionRegistry() {
     private const val PREFIX = "surf.event.anarchy"
 
 
-    val DUPE_NOTIFY = create("$PREFIX.dupenotify")
+    val ANTI_DUPE_NOTIFY = create("$PREFIX.antidupe")
 
     val DEATH_SPECTATOR = create("$PREFIX.death.spectator")
 
