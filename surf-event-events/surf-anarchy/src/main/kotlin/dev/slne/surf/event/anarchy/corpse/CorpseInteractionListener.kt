@@ -66,6 +66,9 @@ object CorpseInteractionListener : Listener {
                 appendAnarchyPrefix()
                 error("Die Leiche ist leer.")
             }
+
+            CorpseManager.corpseOwners.remove(stand.uniqueId)
+            stand.remove()
             return
         }
 
