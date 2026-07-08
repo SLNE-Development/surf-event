@@ -15,7 +15,6 @@ fun SurfComponentBuilder.appendAnarchyPrefix() = append {
     appendSpace()
 }
 
-
 fun SurfComponentBuilder.geilesRot(text: String, vararg decoration: TextDecoration) =
     text(text, TextColor.color(227, 0, 58), *decoration)
 
@@ -36,7 +35,6 @@ fun formatDurationUntil(date: ZonedDateTime): String {
     }
 }
 
-
 fun formatCountdownTime(totalSeconds: Long): String {
     val days = totalSeconds / 86_400
     val hours = totalSeconds % 86_400 / 3_600
@@ -49,4 +47,10 @@ fun formatCountdownTime(totalSeconds: Long): String {
         minutes > 0 -> "$minutes ${if (minutes == 1L) "Minute" else "Minuten"}"
         else -> "$seconds ${if (seconds == 1L) "Sekunde" else "Sekunden"}"
     }
+}
+
+fun SurfComponentBuilder.appendAnarchyBar() = append {
+    appendAnarchyPrefix()
+    appendSpace()
+    darkSpacer("-".repeat(40), TextDecoration.BOLD)
 }

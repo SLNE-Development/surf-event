@@ -65,24 +65,6 @@ object VertBorderManager {
         world.persistentDataContainer.set(key(border), PersistentDataType.DOUBLE, height)
     }
 
-    fun clearBorder(world: World, border: VerticalBorderAlignment) {
-        val borders = borders(world)
-        val borderKey = key(border)
-
-        stopAnimation(world, border)
-        if (border == VerticalBorderAlignment.TOP) {
-            borders.top = null
-        } else {
-            borders.bottom = null
-        }
-
-        world.persistentDataContainer.remove(borderKey)
-    }
-
-    fun shiftBorder(world: World, border: VerticalBorderAlignment, offset: Double) {
-        moveBorder(world, border, currentHeight(world, border) + offset)
-    }
-
     fun moveBorderTo(
         world: World,
         border: VerticalBorderAlignment,

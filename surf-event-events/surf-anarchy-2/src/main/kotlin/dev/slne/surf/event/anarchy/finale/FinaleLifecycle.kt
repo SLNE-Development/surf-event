@@ -7,6 +7,7 @@ import dev.slne.surf.api.core.util.runAtFixedRate
 import dev.slne.surf.api.paper.extensions.server
 import dev.slne.surf.api.paper.util.forEachPlayer
 import dev.slne.surf.event.anarchy.plugin
+import dev.slne.surf.event.anarchy.util.appendAnarchyBar
 import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import dev.slne.surf.event.anarchy.util.formatCountdownTime
 import dev.slne.surf.event.anarchy.util.geilesRot
@@ -28,15 +29,7 @@ object FinaleLifecycle {
     private val WARN_BEFORE_START = 1.hours
     private val BORDER_SHRINK = 1.hours
 
-    private const val HORIZONTAL_BORDER_SIZE = 25.0
-    private const val VERTICAL_BORDER_BOTTOM = 50.0
-    private const val VERTICAL_BORDER_TOP = 100.0
-
-    private val FLEE_WINDOW = 5.minutes
-    private const val MAX_DIMENSION_DPS = 10.0
-
-    private val DAMAGED_GAME_MODES = setOf(GameMode.SURVIVAL, GameMode.ADVENTURE)
-
+    private val USER_GAME_MODES = setOf(GameMode.SURVIVAL, GameMode.ADVENTURE)
     private val countdownMarks = listOf(
         7.days, 6.days, 5.days, 4.days, 3.days, 2.days, 1.days,
         12.hours, 6.hours, 3.hours, 2.hours, 1.hours,
@@ -109,16 +102,44 @@ object FinaleLifecycle {
 
         forEachPlayer { player ->
             player.sendText {
+                appendAnarchyBar()
+                appendNewline()
+
                 appendAnarchyPrefix()
-                info("Das Finale startet in ")
+                appendNewline()
+
+
+                appendAnarchyPrefix()
+                info("Das Finale startet")
+                appendNewline()
+
+                appendAnarchyPrefix()
+                info("in ")
                 variableValue(label)
                 info("!")
 
                 if (warn) {
+                    appendAnarchyPrefix()
                     appendNewline()
-                    error("Der Nether und das End werden geschlossen — ")
-                    error("verlasse sie rechtzeitig, sonst nimmst du tödlichen Schaden!")
+
+                    appendAnarchyPrefix()
+                    geilesRot("Der Nether und das End werden")
+                    appendNewline()
+
+                    appendAnarchyPrefix()
+                    geilesRot("geschlossen — verlasse sie rechtzeitig,")
+                    appendNewline()
+
+                    appendAnarchyPrefix()
+                    geilesRot("sonst nimmst du tödlichen Schaden!")
+                    appendNewline()
                 }
+
+                appendAnarchyPrefix()
+                appendNewline()
+
+                appendAnarchyBar()
+                appendNewline()
             }
 
             if (mark <= 10) {
@@ -142,12 +163,37 @@ object FinaleLifecycle {
             }
 
             player.sendText {
-                appendAnarchyPrefix()
-                info("Das Finale hat ")
-                variableValue("begonnen")
-                info("!")
+                appendAnarchyBar()
                 appendNewline()
-                error("Der Nether und das End sind jetzt geschlossen — verlasse sie sofort, sonst stirbst du!")
+
+                appendAnarchyPrefix()
+                appendNewline()
+
+
+                appendAnarchyPrefix()
+                info("Das Finale hat begonnen.")
+                appendNewline()
+
+                appendAnarchyPrefix()
+                appendNewline()
+
+                appendAnarchyPrefix()
+                geilesRot("Der Nether und das End sind")
+                appendNewline()
+
+                appendAnarchyPrefix()
+                geilesRot("nun geschlossen — verlasse sie")
+                appendNewline()
+
+                appendAnarchyPrefix()
+                geilesRot("sofort, sonst stirbst du!")
+                appendNewline()
+
+                appendAnarchyPrefix()
+                appendNewline()
+
+                appendAnarchyBar()
+                appendNewline()
             }
 
             player.playSound(true) {
@@ -161,11 +207,15 @@ object FinaleLifecycle {
     private fun damageDimensionPlayers() {
         val since = startedAt ?: return
         val damage = dimensionDamagePerSecond(Duration.between(since, ZonedDateTime.now()))
-        if (damage <= 0.0) return
+        if (damage <= 0.0) {
+            return
+        }
 
         forEachPlayer { player ->
             player.scheduler.run(plugin, {
-                if (player.isDead || player.gameMode !in DAMAGED_GAME_MODES) return@run
+                if (player.isDead || player.gameMode !in USER_GAME_MODES) {
+                    return@run
+                }
 
                 val environment = player.world.environment
                 if (environment != World.Environment.NETHER && environment != World.Environment.THE_END) {
@@ -174,7 +224,7 @@ object FinaleLifecycle {
 
                 player.damage(damage)
                 player.sendActionBar(buildText {
-                    error("Verlasse den Nether und das End, sonst stirbst du!")
+                    geilesRot("Verlasse den Nether und das End, sonst stirbst du!")
                 })
             }, null)
         }
@@ -182,8 +232,8 @@ object FinaleLifecycle {
 
     private fun dimensionDamagePerSecond(elapsed: Duration): Double {
         val progress =
-            (elapsed.toMillis().toDouble() / FLEE_WINDOW.inWholeMilliseconds).coerceIn(0.0, 1.0)
-        return MAX_DIMENSION_DPS * progress * progress
+            (elapsed.toMillis().toDouble() / 5.minutes.inWholeMilliseconds).coerceIn(0.0, 1.0)
+        return 10.0 * progress * progress
     }
 
     private suspend fun shrinkBorders() {
@@ -192,20 +242,21 @@ object FinaleLifecycle {
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                changeSize(HORIZONTAL_BORDER_SIZE, BORDER_SHRINK.inWholeSeconds)
+                changeSize(25.0, BORDER_SHRINK.inWholeSeconds * 20)
             }
         }
 
         VertBorderManager.moveBorderTo(
             overworld,
             VerticalBorderAlignment.BOTTOM,
-            VERTICAL_BORDER_BOTTOM,
+            50.0,
             BORDER_SHRINK
         )
+
         VertBorderManager.moveBorderTo(
             overworld,
             VerticalBorderAlignment.TOP,
-            VERTICAL_BORDER_TOP,
+            100.0,
             BORDER_SHRINK
         )
     }
