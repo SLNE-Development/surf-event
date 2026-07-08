@@ -36,11 +36,7 @@ fun formatDurationUntil(date: ZonedDateTime): String {
     }
 }
 
-/**
- * Formats a whole-unit countdown mark (e.g. 7 days, 12 hours, 30 minutes, 10 seconds) into a
- * single-unit German label. The countdown only ever broadcasts clean single-unit marks, so the
- * largest non-zero unit is always sufficient.
- */
+
 fun formatCountdownTime(totalSeconds: Long): String {
     val days = totalSeconds / 86_400
     val hours = totalSeconds % 86_400 / 3_600

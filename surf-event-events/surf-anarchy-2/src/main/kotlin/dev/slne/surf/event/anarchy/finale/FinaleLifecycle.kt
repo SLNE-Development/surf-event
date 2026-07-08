@@ -2,11 +2,7 @@ package dev.slne.surf.event.anarchy.finale
 
 import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
 import com.github.shynixn.mccoroutine.folia.scope
-import dev.slne.surf.api.core.messages.adventure.buildText
-import dev.slne.surf.api.core.messages.adventure.key
-import dev.slne.surf.api.core.messages.adventure.playSound
-import dev.slne.surf.api.core.messages.adventure.sendText
-import dev.slne.surf.api.core.messages.adventure.showTitle
+import dev.slne.surf.api.core.messages.adventure.*
 import dev.slne.surf.api.core.util.runAtFixedRate
 import dev.slne.surf.api.paper.extensions.server
 import dev.slne.surf.api.paper.util.forEachPlayer
@@ -28,19 +24,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * The whole finale is driven by a single one-second tick task.
- *
- * - While a finale is [scheduled][scheduleFinale] but not yet started, the tick broadcasts a
- *   countdown at sensible marks (see [countdownMarks]) and, from [WARN_BEFORE_START] onwards, warns
- *   that the nether/end will close and non spectator/creative players will die.
- * - The moment the scheduled time passes, the tick flips [started] and runs [beginFinale] once:
- *   nether + end access is closed and both the horizontal world border and the vertical border
- *   start shrinking over [BORDER_SHRINK].
- * - While the finale runs, every tick applies escalating damage to players still in the nether/end
- *   (see [dimensionDamagePerSecond]): gentle at first so you can flee within ~[FLEE_WINDOW], then
- *   ramping past what natural regeneration can outpace so lingering is lethal.
- */
 object FinaleLifecycle {
     private val WARN_BEFORE_START = 1.hours
     private val BORDER_SHRINK = 1.hours
@@ -49,10 +32,7 @@ object FinaleLifecycle {
     private const val VERTICAL_BORDER_BOTTOM = 50.0
     private const val VERTICAL_BORDER_TOP = 100.0
 
-    /** How long a full-health player should roughly have to escape the nether/end before it turns lethal. */
     private val FLEE_WINDOW = 5.minutes
-
-    /** Peak damage per second reached at the end of [FLEE_WINDOW] — far above any regeneration. */
     private const val MAX_DIMENSION_DPS = 10.0
 
     private val DAMAGED_GAME_MODES = setOf(GameMode.SURVIVAL, GameMode.ADVENTURE)
@@ -90,8 +70,6 @@ object FinaleLifecycle {
         started = false
         announcedMarks.clear()
 
-        // Suppress marks that already lie in the past relative to when the finale was scheduled, so
-        // scheduling with 3 days left does not immediately spam the 4/5/6/7 day marks.
         val initialSeconds = ceilSeconds(Duration.between(ZonedDateTime.now(), date))
         countdownMarks.forEach { if (it > initialSeconds) announcedMarks.add(it) }
     }
@@ -202,13 +180,9 @@ object FinaleLifecycle {
         }
     }
 
-    /**
-     * Escalating damage-per-second for players still in the nether/end. Ramps quadratically from 0
-     * to [MAX_DIMENSION_DPS] over [FLEE_WINDOW]: negligible right after the start (time to flee),
-     * then quickly outpacing natural regeneration so staying is fatal.
-     */
     private fun dimensionDamagePerSecond(elapsed: Duration): Double {
-        val progress = (elapsed.toMillis().toDouble() / FLEE_WINDOW.inWholeMilliseconds).coerceIn(0.0, 1.0)
+        val progress =
+            (elapsed.toMillis().toDouble() / FLEE_WINDOW.inWholeMilliseconds).coerceIn(0.0, 1.0)
         return MAX_DIMENSION_DPS * progress * progress
     }
 
@@ -218,7 +192,7 @@ object FinaleLifecycle {
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                setSize(HORIZONTAL_BORDER_SIZE, BORDER_SHRINK.inWholeSeconds)
+                changeSize(HORIZONTAL_BORDER_SIZE, BORDER_SHRINK.inWholeSeconds)
             }
         }
 
