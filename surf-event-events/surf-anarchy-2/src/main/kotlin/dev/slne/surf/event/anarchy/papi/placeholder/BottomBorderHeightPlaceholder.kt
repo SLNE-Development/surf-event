@@ -10,6 +10,6 @@ object BottomBorderHeightPlaceholder : PapiPlaceholder("vert-border_bottom") {
     override fun parse(
         player: OfflinePlayer,
         args: List<String>
-    ) = VertBorderManager.currentHeight(Bukkit.getWorlds().first(), VerticalBorderAlignment.TOP)
+    ) = VertBorderManager.currentHeight(Bukkit.getWorlds().first(), VerticalBorderAlignment.BOTTOM)
         .toString()
 }
