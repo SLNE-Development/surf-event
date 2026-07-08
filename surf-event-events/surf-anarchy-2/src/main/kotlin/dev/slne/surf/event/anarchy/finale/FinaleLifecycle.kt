@@ -20,6 +20,7 @@ import org.bukkit.World
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -219,6 +220,10 @@ object FinaleLifecycle {
 
                 player.damage(damage)
                 player.sendActionBar(buildText {
+                    error("⚠")
+                    appendSpace()
+                    darkSpacer("|")
+                    appendSpace()
                     geilesRot("Verlasse den Nether und das End, sonst stirbst du!")
                 })
             }, null)
@@ -228,7 +233,7 @@ object FinaleLifecycle {
     private fun dimensionDamagePerSecond(elapsed: Duration): Double {
         val progress =
             (elapsed.toMillis().toDouble() / 5.minutes.inWholeMilliseconds).coerceIn(0.0, 1.0)
-        return 10.0 * progress * progress
+        return 50.0 * sqrt(progress)
     }
 
     private suspend fun shrinkBorders() {

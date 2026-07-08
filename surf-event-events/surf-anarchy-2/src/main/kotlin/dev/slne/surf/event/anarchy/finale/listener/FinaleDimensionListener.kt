@@ -16,7 +16,7 @@ object FinaleDimensionListener : Listener {
             return
         }
 
-        if (event.player.world.environment == World.Environment.NORMAL) {
+        if (event.player.world.environment != World.Environment.NORMAL) {
             return
         }
 
