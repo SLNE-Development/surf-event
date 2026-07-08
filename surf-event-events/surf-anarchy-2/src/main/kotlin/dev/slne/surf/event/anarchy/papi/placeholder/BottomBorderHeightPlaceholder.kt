@@ -6,7 +6,7 @@ import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 
-object BottomBorderHeightPlaceholder : PapiPlaceholder("vert-border_bottom") {
+object BottomBorderHeightPlaceholder : PapiPlaceholder("vert-border-bottom") {
     override fun parse(
         player: OfflinePlayer,
         args: List<String>
