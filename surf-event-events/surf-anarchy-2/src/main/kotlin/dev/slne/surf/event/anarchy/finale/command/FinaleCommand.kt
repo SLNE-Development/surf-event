@@ -27,7 +27,7 @@ fun finaleCommand() = commandTree("finale") {
                     return@anyExecutor
                 }
 
-                FinaleLifecycle.scheduleFinale(date, sender)
+                FinaleLifecycle.scheduleFinale(date)
 
                 sender.sendText {
                     appendAnarchyPrefix()
@@ -52,7 +52,7 @@ fun finaleCommand() = commandTree("finale") {
                 return@anyExecutor
             }
 
-            FinaleLifecycle.cancelFinale(sender)
+            FinaleLifecycle.cancelFinale()
 
             sender.sendText {
                 appendAnarchyPrefix()
