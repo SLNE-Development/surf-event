@@ -33,3 +33,4 @@ plugins {
 
 
 include("surf-event-events:surf-anarchy")
+include("surf-event-events:surf-anarchy-2")
