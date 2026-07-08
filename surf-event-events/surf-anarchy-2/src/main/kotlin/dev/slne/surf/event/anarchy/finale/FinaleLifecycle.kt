@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object FinaleLifecycle {
     private val WARN_BEFORE_START = 1.hours
-    private val BORDER_SHRINK = 1.hours
+    private val BORDER_SHRINK = 5.minutes // TODO: Increase
 
     private val USER_GAME_MODES = setOf(GameMode.SURVIVAL, GameMode.ADVENTURE)
     private val countdownMarks = listOf(
@@ -242,7 +242,7 @@ object FinaleLifecycle {
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                changeSize(25.0, BORDER_SHRINK.inWholeSeconds * 20)
+                changeSize(50.0, BORDER_SHRINK.inWholeSeconds * 20)
             }
         }
 

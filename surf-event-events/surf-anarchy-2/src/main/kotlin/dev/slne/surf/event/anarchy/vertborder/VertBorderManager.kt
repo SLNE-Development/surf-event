@@ -18,7 +18,7 @@ object VertBorderManager {
     private const val DAMAGE_AT_ONE = 0.5
     private const val DAMAGE_AT_TEN = 6.0
     private const val ANIMATION_STEP_TICKS = 1L
-    const val WARNING_DISTANCE = 15.0
+    const val WARNING_DISTANCE = 5.0
 
     private val borderCache = ConcurrentHashMap<UUID, Borders>()
     private val animationTasks =
