@@ -85,12 +85,7 @@ object FinaleLifecycle {
             setCenter(0.0, 0.0)
         }
 
-        VertBorderManager.moveBorder(world, VerticalBorderAlignment.TOP, world.maxHeight.toDouble())
-        VertBorderManager.moveBorder(
-            world,
-            VerticalBorderAlignment.BOTTOM,
-            world.minHeight.toDouble()
-        )
+        VertBorderManager.clearBorders(world)
     }
 
     private suspend fun tick() {
