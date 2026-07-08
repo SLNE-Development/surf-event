@@ -15,6 +15,7 @@ import dev.slne.surf.event.anarchy.vertborder.VertBorderManager
 import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.World
 import java.time.Duration
@@ -73,6 +74,23 @@ object FinaleLifecycle {
         startedAt = null
         started = false
         announcedMarks.clear()
+    }
+
+    fun resetAll() {
+        val world = Bukkit.getWorlds().first()
+
+        cancelFinale()
+        with(world.worldBorder) {
+            size = 5000.0
+            setCenter(0.0, 0.0)
+        }
+
+        VertBorderManager.moveBorder(world, VerticalBorderAlignment.TOP, world.maxHeight.toDouble())
+        VertBorderManager.moveBorder(
+            world,
+            VerticalBorderAlignment.BOTTOM,
+            world.minHeight.toDouble()
+        )
     }
 
     private suspend fun tick() {

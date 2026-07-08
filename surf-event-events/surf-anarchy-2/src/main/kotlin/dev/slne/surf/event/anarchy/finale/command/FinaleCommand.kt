@@ -60,4 +60,30 @@ fun finaleCommand() = commandTree("finale") {
             }
         }
     }
+
+    literalArgument("reset") {
+        anyExecutor { sender, _ ->
+            FinaleLifecycle.resetAll()
+
+            sender.sendText {
+                appendAnarchyPrefix()
+                success("Das Finale wurde erfolgreich zurückgesetzt!")
+            }
+        }
+    }
+
+    literalArgument("debugInfo") {
+        anyExecutor { sender, _ ->
+            sender.sendText {
+                appendAnarchyPrefix()
+                info("Finale geplant: ")
+                variableValue(FinaleLifecycle.isScheduled().toString())
+
+                appendNewline()
+                appendAnarchyPrefix()
+                info("Finale gestartet: ")
+                variableValue(FinaleLifecycle.isRunning().toString())
+            }
+        }
+    }
 }

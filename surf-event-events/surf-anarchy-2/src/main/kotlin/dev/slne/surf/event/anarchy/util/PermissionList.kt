@@ -6,4 +6,5 @@ object PermissionList : PermissionRegistry() {
     private const val BASE = "surf.event.anarchy"
 
     val FINALE_COMMAND = create("$BASE.finale.command")
+    val FINALE_JOIN = create("$BASE.finale.join")
 }
