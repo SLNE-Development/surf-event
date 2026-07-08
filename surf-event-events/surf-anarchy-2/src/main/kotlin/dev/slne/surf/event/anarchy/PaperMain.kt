@@ -2,9 +2,11 @@ package dev.slne.surf.event.anarchy
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.api.paper.event.register
+import dev.slne.surf.api.paper.hook.papi.SurfPaperPAPIHook
 import dev.slne.surf.event.anarchy.finale.FinaleLifecycle
 import dev.slne.surf.event.anarchy.finale.command.finaleCommand
 import dev.slne.surf.event.anarchy.finale.listener.FinaleDimensionListener
+import dev.slne.surf.event.anarchy.papi.AnarchyPlaceholderExpansion
 import dev.slne.surf.event.anarchy.vertborder.VertBorderService
 import dev.slne.surf.event.anarchy.vertborder.listener.VertBorderListener
 import org.bukkit.plugin.java.JavaPlugin
@@ -20,6 +22,8 @@ class PaperMain : SuspendingJavaPlugin() {
         VertBorderService.start()
 
         finaleCommand()
+
+        SurfPaperPAPIHook.register(AnarchyPlaceholderExpansion)
     }
 
     override suspend fun onDisableAsync() {

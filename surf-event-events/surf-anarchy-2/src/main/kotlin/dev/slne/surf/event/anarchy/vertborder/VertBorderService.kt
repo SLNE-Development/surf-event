@@ -6,7 +6,7 @@ import dev.slne.surf.api.core.messages.adventure.showTitle
 import dev.slne.surf.api.paper.util.BukkitSound
 import dev.slne.surf.event.anarchy.plugin
 import dev.slne.surf.event.anarchy.util.geilesRot
-import dev.slne.surf.event.anarchy.vertborder.util.VerticalBorderAlignment
+import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import org.bukkit.Color
@@ -16,6 +16,7 @@ import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToInt
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -122,6 +123,21 @@ object VertBorderService {
             val perRun = VertBorderManager.damagePerSecond(outside) * INTERVAL_SECONDS
             if (perRun > 0.0) {
                 player.damage(perRun)
+                player.showTitle {
+                    title {
+                        geilesRot("Weltengrenze")
+                    }
+
+                    subtitle {
+                        spacer("Kehre um, bevor du stirbst!")
+                    }
+
+                    times {
+                        fadeIn(Duration.ZERO)
+                        stay(2.seconds)
+                        fadeOut(Duration.ZERO)
+                    }
+                }
             }
         }
 

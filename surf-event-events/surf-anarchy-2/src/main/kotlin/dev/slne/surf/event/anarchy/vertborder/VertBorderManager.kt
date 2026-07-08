@@ -1,13 +1,11 @@
 package dev.slne.surf.event.anarchy.vertborder
 
-import dev.slne.surf.api.paper.util.namespacedKey
 import dev.slne.surf.event.anarchy.plugin
-import dev.slne.surf.event.anarchy.vertborder.util.Borders
-import dev.slne.surf.event.anarchy.vertborder.util.VerticalBorderAlignment
+import dev.slne.surf.event.anarchy.vertborder.border.Borders
+import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import org.bukkit.World
-import org.bukkit.persistence.PersistentDataType
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.pow
@@ -15,9 +13,6 @@ import kotlin.time.Duration
 
 
 object VertBorderManager {
-    private val topKey = namespacedKey("vert_border-top")
-    private val bottomKey = namespacedKey("vert_border-bottom")
-
     private val growth = (DAMAGE_AT_TEN / DAMAGE_AT_ONE).pow(1.0 / 9.0)
 
     private const val DAMAGE_AT_ONE = 0.5
@@ -29,14 +24,8 @@ object VertBorderManager {
     private val animationTasks =
         ConcurrentHashMap<Pair<UUID, VerticalBorderAlignment>, ScheduledTask>()
 
-    private fun key(border: VerticalBorderAlignment) =
-        if (border == VerticalBorderAlignment.TOP) topKey else bottomKey
-
     private fun borders(world: World) = borderCache.computeIfAbsent(world.uid) {
-        Borders(
-            world.persistentDataContainer.get(topKey, PersistentDataType.DOUBLE),
-            world.persistentDataContainer.get(bottomKey, PersistentDataType.DOUBLE)
-        )
+        Borders(null, null)
     }
 
     fun borderHeight(world: World, border: VerticalBorderAlignment): Double? = borders(world).let {
@@ -61,8 +50,6 @@ object VertBorderManager {
         } else {
             borders.bottom = height
         }
-
-        world.persistentDataContainer.set(key(border), PersistentDataType.DOUBLE, height)
     }
 
     fun moveBorderTo(

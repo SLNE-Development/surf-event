@@ -12,7 +12,7 @@ import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import dev.slne.surf.event.anarchy.util.formatCountdownTime
 import dev.slne.surf.event.anarchy.util.geilesRot
 import dev.slne.surf.event.anarchy.vertborder.VertBorderManager
-import dev.slne.surf.event.anarchy.vertborder.util.VerticalBorderAlignment
+import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import org.bukkit.GameMode
@@ -110,28 +110,25 @@ object FinaleLifecycle {
 
 
                 appendAnarchyPrefix()
-                info("Das Finale startet")
-                appendNewline()
-
-                appendAnarchyPrefix()
-                info("in ")
+                info("Das Finale startet in ")
                 variableValue(label)
                 info("!")
+                appendNewline()
 
                 if (warn) {
                     appendAnarchyPrefix()
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    geilesRot("Der Nether und das End werden")
+                    error("Der Nether und das End werden")
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    geilesRot("geschlossen — verlasse sie rechtzeitig,")
+                    error("geschlossen — verlasse sie rechtzeitig,")
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    geilesRot("sonst nimmst du tödlichen Schaden!")
+                    error("sonst nimmst du tödlichen Schaden!")
                     appendNewline()
                 }
 
@@ -139,7 +136,6 @@ object FinaleLifecycle {
                 appendNewline()
 
                 appendAnarchyBar()
-                appendNewline()
             }
 
             if (mark <= 10) {
@@ -178,22 +174,21 @@ object FinaleLifecycle {
                 appendNewline()
 
                 appendAnarchyPrefix()
-                geilesRot("Der Nether und das End sind")
+                error("Der Nether und das End sind")
                 appendNewline()
 
                 appendAnarchyPrefix()
-                geilesRot("nun geschlossen — verlasse sie")
+                error("nun geschlossen — verlasse sie")
                 appendNewline()
 
                 appendAnarchyPrefix()
-                geilesRot("sofort, sonst stirbst du!")
+                error("sofort, sonst stirbst du!")
                 appendNewline()
 
                 appendAnarchyPrefix()
                 appendNewline()
 
                 appendAnarchyBar()
-                appendNewline()
             }
 
             player.playSound(true) {

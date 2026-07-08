@@ -51,6 +51,5 @@ fun formatCountdownTime(totalSeconds: Long): String {
 
 fun SurfComponentBuilder.appendAnarchyBar() = append {
     appendAnarchyPrefix()
-    appendSpace()
-    darkSpacer("-".repeat(40), TextDecoration.BOLD)
+    spacer("-".repeat(40), TextDecoration.STRIKETHROUGH)
 }

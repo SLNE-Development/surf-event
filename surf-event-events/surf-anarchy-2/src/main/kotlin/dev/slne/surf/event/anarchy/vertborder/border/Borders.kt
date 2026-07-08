@@ -1,4 +1,4 @@
-package dev.slne.surf.event.anarchy.vertborder.util
+package dev.slne.surf.event.anarchy.vertborder.border
 
 data class Borders(
     @Volatile var top: Double?,
