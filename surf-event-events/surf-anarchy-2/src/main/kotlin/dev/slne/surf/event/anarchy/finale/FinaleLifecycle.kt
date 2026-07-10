@@ -29,7 +29,10 @@ import kotlin.time.Duration.Companion.seconds
 
 object FinaleLifecycle {
     private val WARN_BEFORE_START = 1.hours
-    private val BORDER_SHRINK = 5.minutes // TODO: Increase
+    val DEFAULT_FINALE_DURATION = 5.minutes
+
+    var finaleDuration: kotlin.time.Duration = DEFAULT_FINALE_DURATION
+        private set
 
     private val USER_GAME_MODES = setOf(GameMode.SURVIVAL, GameMode.ADVENTURE)
     private val countdownMarks = listOf(
@@ -59,10 +62,27 @@ object FinaleLifecycle {
     fun isScheduled() = startAt != null && !started
     fun isRunning() = started
 
-    fun scheduleFinale(date: ZonedDateTime) {
+    fun secondsUntilStart(): Long? {
+        val start = startAt ?: return null
+        if (started) return null
+        return ceilSeconds(Duration.between(ZonedDateTime.now(), start)).coerceAtLeast(0)
+    }
+
+    fun secondsUntilFinalBorder(): Long? {
+        val since = startedAt ?: return null
+        val elapsed = Duration.between(since, ZonedDateTime.now())
+        val remaining = finaleDuration.inWholeSeconds - elapsed.seconds
+        return remaining.coerceAtLeast(0)
+    }
+
+    fun scheduleFinale(
+        date: ZonedDateTime,
+        duration: kotlin.time.Duration = DEFAULT_FINALE_DURATION
+    ) {
         startAt = date
         startedAt = null
         started = false
+        finaleDuration = duration
         announcedMarks.clear()
 
         val initialSeconds = ceilSeconds(Duration.between(ZonedDateTime.now(), date))
@@ -255,7 +275,7 @@ object FinaleLifecycle {
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                changeSize(50.0, BORDER_SHRINK.inWholeSeconds * 20)
+                changeSize(50.0, finaleDuration.inWholeSeconds * 20)
             }
         }
 
@@ -263,14 +283,14 @@ object FinaleLifecycle {
             overworld,
             VerticalBorderAlignment.BOTTOM,
             50.0,
-            BORDER_SHRINK
+            finaleDuration
         )
 
         VertBorderManager.moveBorderTo(
             overworld,
             VerticalBorderAlignment.TOP,
             100.0,
-            BORDER_SHRINK
+            finaleDuration
         )
     }
 
