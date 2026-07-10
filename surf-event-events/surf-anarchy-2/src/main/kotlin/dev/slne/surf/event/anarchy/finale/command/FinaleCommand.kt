@@ -1,11 +1,7 @@
 package dev.slne.surf.event.anarchy.finale.command
 
 import dev.jorel.commandapi.executors.CommandArguments
-import dev.jorel.commandapi.kotlindsl.anyExecutor
-import dev.jorel.commandapi.kotlindsl.commandTree
-import dev.jorel.commandapi.kotlindsl.getValue
-import dev.jorel.commandapi.kotlindsl.integerArgument
-import dev.jorel.commandapi.kotlindsl.literalArgument
+import dev.jorel.commandapi.kotlindsl.*
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.event.anarchy.finale.FinaleLifecycle
 import dev.slne.surf.event.anarchy.finale.command.argument.zonedDateTimeArgument
@@ -20,15 +16,18 @@ import kotlin.time.Duration.Companion.minutes
 fun finaleCommand() = commandTree("finale") {
     withPermission(PermissionList.FINALE_COMMAND)
     literalArgument("schedule") {
-        zonedDateTimeArgument("date") {
-            anyExecutor { sender, arguments ->
-                scheduleFinale(sender, arguments, null)
+        anyExecutor { sender, _ ->
+            sender.sendText {
+                appendErrorPrefix()
+                error("Bitte nutze: /finale schedule <Dauer in Minuten> <Start-Datum>: z.b. /finale schedule 60 18.07.2026 18:00")
             }
+        }
 
-            integerArgument("durationMinutes", 1) {
+        integerArgument("durationMinutes", 1) {
+            zonedDateTimeArgument("date") {
                 anyExecutor { sender, arguments ->
-                    val minutes: Int by arguments
-                    scheduleFinale(sender, arguments, minutes)
+                    val durationMinutes: Int by arguments
+                    scheduleFinale(sender, arguments, durationMinutes)
                 }
             }
         }

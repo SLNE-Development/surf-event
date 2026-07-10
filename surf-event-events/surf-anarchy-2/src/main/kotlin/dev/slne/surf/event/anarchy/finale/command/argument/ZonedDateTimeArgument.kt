@@ -23,7 +23,7 @@ class ZonedDateTimeArgument(nodeName: String) :
     }) {
     init {
         this.replaceSuggestions(
-            ArgumentSuggestions.strings("08.07.2026 12:32", "28.01.2032 23:59", "14.02.2002 09:43")
+            ArgumentSuggestions.strings("18.07.2026 18:00")
         )
     }
 }

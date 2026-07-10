@@ -33,7 +33,7 @@ object FinaleConnectionListener : Listener {
                     SurfComponentBuilder(),
                     "DAS ANARCHY-FINALE LÄUFT BEREITS!",
                     {
-                        spacer("Das Finale ist bereits gestartet und du hast kannst nicht mehr beitreten.")
+                        spacer("Das Finale ist bereits gestartet und kannst nicht mehr beitreten.")
                     },
                     { appendDiscordLink() })
             )

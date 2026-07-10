@@ -5,6 +5,7 @@ import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.api.paper.hook.papi.SurfPaperPAPIHook
 import dev.slne.surf.event.anarchy.finale.FinaleLifecycle
 import dev.slne.surf.event.anarchy.finale.command.finaleCommand
+import dev.slne.surf.event.anarchy.finale.command.vertBorderCommand
 import dev.slne.surf.event.anarchy.finale.listener.FinaleConnectionListener
 import dev.slne.surf.event.anarchy.finale.listener.FinaleDeathListener
 import dev.slne.surf.event.anarchy.finale.listener.FinaleDimensionListener
@@ -26,6 +27,7 @@ class PaperMain : SuspendingJavaPlugin() {
         VertBorderService.start()
 
         finaleCommand()
+        vertBorderCommand()
 
         SurfPaperPAPIHook.register(AnarchyPlaceholderExpansion)
     }

@@ -7,4 +7,6 @@ object PermissionList : PermissionRegistry() {
 
     val FINALE_COMMAND = create("$BASE.finale.command")
     val FINALE_JOIN = create("$BASE.finale.join")
+
+    val VERTBORDER_COMMAND = create("$BASE.vertborder.command")
 }
