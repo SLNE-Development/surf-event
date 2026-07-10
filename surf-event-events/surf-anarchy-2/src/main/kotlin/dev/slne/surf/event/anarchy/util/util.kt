@@ -37,16 +37,11 @@ fun formatDurationUntil(date: ZonedDateTime): String {
 
 fun formatCountdownTime(totalSeconds: Long): String {
     val days = totalSeconds / 86_400
-    val hours = totalSeconds % 86_400 / 3_600
-    val minutes = totalSeconds % 3_600 / 60
+    val hours = (totalSeconds % 86_400) / 3_600
+    val minutes = (totalSeconds % 3_600) / 60
     val seconds = totalSeconds % 60
 
-    return when {
-        days > 0 -> "$days ${if (days == 1L) "Tag" else "Tage"}"
-        hours > 0 -> "$hours ${if (hours == 1L) "Stunde" else "Stunden"}"
-        minutes > 0 -> "$minutes ${if (minutes == 1L) "Minute" else "Minuten"}"
-        else -> "$seconds ${if (seconds == 1L) "Sekunde" else "Sekunden"}"
-    }
+    return "%02d:%02d:%02d:%02d".format(days, hours, minutes, seconds)
 }
 
 fun SurfComponentBuilder.appendAnarchyBar() = append {

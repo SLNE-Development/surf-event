@@ -2,10 +2,15 @@ package dev.slne.surf.event.anarchy.finale
 
 import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
 import com.github.shynixn.mccoroutine.folia.scope
-import dev.slne.surf.api.core.messages.adventure.*
+import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.messages.adventure.playSound
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.adventure.showTitle
 import dev.slne.surf.api.core.util.runAtFixedRate
 import dev.slne.surf.api.paper.extensions.server
+import dev.slne.surf.api.paper.util.BukkitSound
 import dev.slne.surf.api.paper.util.forEachPlayer
+import dev.slne.surf.event.anarchy.config.AnarchyConfig
 import dev.slne.surf.event.anarchy.plugin
 import dev.slne.surf.event.anarchy.util.appendAnarchyBar
 import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
@@ -49,7 +54,8 @@ object FinaleLifecycle {
 
     private lateinit var tickJob: Job
 
-    fun create() {
+    suspend fun create() {
+        restoreFromConfig()
         tickJob = plugin.scope.runAtFixedRate(1.seconds) { tick() }
     }
 
@@ -79,6 +85,16 @@ object FinaleLifecycle {
         date: ZonedDateTime,
         duration: kotlin.time.Duration = DEFAULT_FINALE_DURATION
     ) {
+        applySchedule(date, duration)
+
+        AnarchyConfig.edit {
+            finaleConfig.start = date
+            finaleConfig.finaleDurationMinutes = duration.inWholeMinutes.toInt()
+            finaleConfig.startedAt = null
+        }
+    }
+
+    private fun applySchedule(date: ZonedDateTime, duration: kotlin.time.Duration) {
         startAt = date
         startedAt = null
         started = false
@@ -93,7 +109,39 @@ object FinaleLifecycle {
         startAt = null
         startedAt = null
         started = false
+        finaleDuration = DEFAULT_FINALE_DURATION
         announcedMarks.clear()
+
+        AnarchyConfig.edit {
+            finaleConfig.start = null
+            finaleConfig.finaleDurationMinutes = null
+            finaleConfig.startedAt = null
+        }
+    }
+
+    private suspend fun restoreFromConfig() {
+        val config = AnarchyConfig.getConfig().finaleConfig
+        val savedStart = config.start ?: return
+        val savedStartedAt = config.startedAt
+        val duration = config.finaleDurationMinutes?.minutes ?: DEFAULT_FINALE_DURATION
+
+        if (savedStartedAt != null) {
+            // Finale lief bereits vor dem Neustart -> laufenden Zustand fortsetzen
+            startAt = savedStart
+            startedAt = savedStartedAt
+            started = true
+            finaleDuration = duration
+            announcedMarks.clear()
+
+            val remainingSeconds = (duration.inWholeSeconds -
+                    Duration.between(savedStartedAt, ZonedDateTime.now()).seconds)
+                .coerceAtLeast(0)
+            shrinkBorders(remainingSeconds.seconds)
+        } else {
+            // Noch nicht gestartet -> neu einplanen; liegt der Start bereits in der
+            // Vergangenheit (Server war offline), startet der naechste Tick das Finale sofort
+            applySchedule(savedStart, duration)
+        }
     }
 
     fun resetAll() {
@@ -122,6 +170,7 @@ object FinaleLifecycle {
         } else {
             started = true
             startedAt = now
+            AnarchyConfig.edit { finaleConfig.startedAt = now }
             beginFinale()
         }
     }
@@ -180,7 +229,8 @@ object FinaleLifecycle {
             }
 
             player.playSound(true) {
-                type(key("nexo", "countdown"))
+                type(BukkitSound.BLOCK_NOTE_BLOCK_PLING)
+                pitch(0f)
             }
         }
     }
@@ -188,8 +238,8 @@ object FinaleLifecycle {
     private suspend fun beginFinale() {
         forEachPlayer { player ->
             player.showTitle {
-                title { geilesRot("Finale") }
-                subtitle { spacer("Das Finale hat begonnen!") }
+                title { geilesRot("Last man standing.") }
+                subtitle { spacer("Überlebe so lange du kannst...") }
             }
 
             player.sendText {
@@ -226,7 +276,8 @@ object FinaleLifecycle {
             }
 
             player.playSound(true) {
-                type(key("nexo", "start"))
+                type(BukkitSound.BLOCK_NOTE_BLOCK_PLING)
+                pitch(1f)
             }
         }
 
@@ -269,13 +320,17 @@ object FinaleLifecycle {
         return 50.0 * sqrt(progress)
     }
 
-    private suspend fun shrinkBorders() {
+    private suspend fun shrinkBorders(duration: kotlin.time.Duration = finaleDuration) {
         val overworld = server.worlds.first { it.environment == World.Environment.NORMAL }
 
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                changeSize(50.0, finaleDuration.inWholeSeconds * 20)
+                if (duration.inWholeSeconds <= 0) {
+                    size = 50.0
+                } else {
+                    changeSize(50.0, duration.inWholeSeconds * 20)
+                }
             }
         }
 
@@ -283,14 +338,14 @@ object FinaleLifecycle {
             overworld,
             VerticalBorderAlignment.BOTTOM,
             50.0,
-            finaleDuration
+            duration
         )
 
         VertBorderManager.moveBorderTo(
             overworld,
             VerticalBorderAlignment.TOP,
             100.0,
-            finaleDuration
+            duration
         )
     }
 
