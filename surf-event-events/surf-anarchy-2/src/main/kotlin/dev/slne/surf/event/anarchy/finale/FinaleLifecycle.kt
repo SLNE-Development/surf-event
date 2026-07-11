@@ -149,7 +149,7 @@ object FinaleLifecycle {
 
         cancelFinale()
         with(world.worldBorder) {
-            size = 5000.0
+            size = 7500.0
             setCenter(0.0, 0.0)
         }
 
