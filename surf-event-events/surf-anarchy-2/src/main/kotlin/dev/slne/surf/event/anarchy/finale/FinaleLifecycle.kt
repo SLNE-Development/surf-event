@@ -337,14 +337,14 @@ object FinaleLifecycle {
         VertBorderManager.moveBorderTo(
             overworld,
             VerticalBorderAlignment.BOTTOM,
-            50.0,
+            65.0,
             duration
         )
 
         VertBorderManager.moveBorderTo(
             overworld,
             VerticalBorderAlignment.TOP,
-            100.0,
+            115.0,
             duration
         )
     }
