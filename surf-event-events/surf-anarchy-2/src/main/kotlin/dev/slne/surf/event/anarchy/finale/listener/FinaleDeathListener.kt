@@ -33,7 +33,7 @@ object FinaleDeathListener : Listener {
 
         val reason = CommonComponents.renderDisconnectMessage(
             SurfComponentBuilder(),
-            "DU BIST GESTORBEN!",
+            "DU BIST AUSGESCHIEDEN!",
             {
                 if (killer == null) {
                     spacer("Du bist gestorben.")
