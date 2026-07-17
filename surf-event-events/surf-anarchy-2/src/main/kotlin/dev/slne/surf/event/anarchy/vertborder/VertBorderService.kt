@@ -195,7 +195,6 @@ object VertBorderService {
             for (z in (centerZ - BORDER_PLANE_RADIUS)..(centerZ + BORDER_PLANE_RADIUS)) {
                 val dx = x - centerX
                 val dz = z - centerZ
-                // Ecken weglassen -> abgerundetes Quadrat statt scharfer Ecken
                 if (kotlin.math.abs(dx) == BORDER_PLANE_RADIUS && kotlin.math.abs(dz) == BORDER_PLANE_RADIUS) {
                     continue
                 }
