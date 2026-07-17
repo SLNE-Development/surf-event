@@ -17,7 +17,6 @@ import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import dev.slne.surf.event.anarchy.util.formatCountdownTime
 import dev.slne.surf.event.anarchy.util.geilesRot
 import dev.slne.surf.event.anarchy.vertborder.VertBorderManager
-import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.format.TextDecoration
@@ -324,20 +323,6 @@ object FinaleLifecycle {
                 }
             }
         }
-
-        VertBorderManager.moveBorderTo(
-            overworld,
-            VerticalBorderAlignment.BOTTOM,
-            65.0,
-            duration
-        )
-
-        VertBorderManager.moveBorderTo(
-            overworld,
-            VerticalBorderAlignment.TOP,
-            115.0,
-            duration
-        )
     }
 
     private fun ceilSeconds(duration: Duration) = (duration.toMillis() + 999) / 1000
