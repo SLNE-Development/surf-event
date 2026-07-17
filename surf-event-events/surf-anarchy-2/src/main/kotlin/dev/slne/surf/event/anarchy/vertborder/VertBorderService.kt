@@ -9,8 +9,8 @@ import dev.slne.surf.event.anarchy.util.geilesRot
 import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
-import org.bukkit.Color
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.entity.Player
 import java.util.*
@@ -23,9 +23,10 @@ import kotlin.time.Duration.Companion.seconds
 object VertBorderService {
     private const val INTERVAL_TICKS = 5L
     private const val INTERVAL_SECONDS = INTERVAL_TICKS / 20.0
+    private const val BORDER_PLANE_RADIUS = 2
 
     private val ENFORCED_GAME_MODES = setOf(GameMode.SURVIVAL, GameMode.ADVENTURE)
-    private val dustOptions = Particle.DustOptions(Color.fromRGB(0xFF3333), 1.6f)
+    private val blockMarkerOptions = Material.BARRIER.createBlockData()
     private val tasks = ConcurrentHashMap<UUID, ScheduledTask>()
     private val warned = ConcurrentHashMap.newKeySet<UUID>()
 
@@ -186,12 +187,28 @@ object VertBorderService {
         warned.remove(player.uniqueId)
     }
 
-    private fun showBorderPlane(player: Player, border: Double) = player.spawnParticle(
-        Particle.DUST,
-        player.location.x, border, player.location.z,
-        30,
-        2.5, 0.0, 2.5,
-        0.0,
-        dustOptions
-    )
+    private fun showBorderPlane(player: Player, border: Double) {
+        val centerX = player.location.blockX
+        val centerZ = player.location.blockZ
+
+        for (x in (centerX - BORDER_PLANE_RADIUS)..(centerX + BORDER_PLANE_RADIUS)) {
+            for (z in (centerZ - BORDER_PLANE_RADIUS)..(centerZ + BORDER_PLANE_RADIUS)) {
+                val dx = x - centerX
+                val dz = z - centerZ
+                // Ecken weglassen -> abgerundetes Quadrat statt scharfer Ecken
+                if (kotlin.math.abs(dx) == BORDER_PLANE_RADIUS && kotlin.math.abs(dz) == BORDER_PLANE_RADIUS) {
+                    continue
+                }
+
+                player.spawnParticle(
+                    Particle.BLOCK_MARKER,
+                    x + 0.5, border, z + 0.5,
+                    1,
+                    0.0, 0.0, 0.0,
+                    0.0,
+                    blockMarkerOptions
+                )
+            }
+        }
+    }
 }
