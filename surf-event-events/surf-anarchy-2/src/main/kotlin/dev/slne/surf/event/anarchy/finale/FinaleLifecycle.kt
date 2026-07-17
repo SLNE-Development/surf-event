@@ -2,7 +2,7 @@ package dev.slne.surf.event.anarchy.finale
 
 import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
 import com.github.shynixn.mccoroutine.folia.scope
-import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.font.toSmallCaps
 import dev.slne.surf.api.core.messages.adventure.playSound
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.api.core.messages.adventure.showTitle
@@ -20,6 +20,7 @@ import dev.slne.surf.event.anarchy.vertborder.VertBorderManager
 import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.World
@@ -43,8 +44,8 @@ object FinaleLifecycle {
     private val countdownMarks = listOf(
         7.days, 6.days, 5.days, 4.days, 3.days, 2.days, 1.days,
         12.hours, 6.hours, 3.hours, 2.hours, 1.hours,
-        30.minutes, 15.minutes, 10.minutes, 5.minutes, 4.minutes, 3.minutes, 2.minutes, 1.minutes,
-        30.seconds, 20.seconds, 10.seconds, 5.seconds, 4.seconds, 3.seconds, 2.seconds, 1.seconds
+        30.minutes, 15.minutes, 10.minutes, 5.minutes, 4.minutes, 3.minutes, 1.minutes,
+        30.seconds, 20.seconds, 10.seconds, 3.seconds, 2.seconds, 1.seconds
     ).map { it.inWholeSeconds }
 
     private var startAt: ZonedDateTime? = null
@@ -194,7 +195,7 @@ object FinaleLifecycle {
 
                 appendAnarchyPrefix()
                 info("Das Finale startet in ")
-                variableValue(label)
+                variableValue(label, TextDecoration.BOLD)
                 info("!")
                 appendNewline()
 
@@ -203,34 +204,30 @@ object FinaleLifecycle {
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    error("Der Nether und das End werden")
+                    error("Der Nether und das End werden".toSmallCaps())
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    error("geschlossen — verlasse sie rechtzeitig,")
+                    error("geschlossen — verlasse sie rechtzeitig!".toSmallCaps())
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    error("sonst nimmst du tödlichen Schaden!")
                     appendNewline()
+
+                    appendAnarchyBar()
                 }
 
-                appendAnarchyPrefix()
-                appendNewline()
-
-                appendAnarchyBar()
-            }
-
-            if (mark <= 10) {
-                player.showTitle {
-                    title { geilesRot(mark.toString()) }
-                    subtitle { spacer("Das Finale startet in $label...") }
+                if (mark <= 10) {
+                    player.showTitle {
+                        title { geilesRot(mark.toString()) }
+                        subtitle { spacer("Das Finale startet in $label...") }
+                    }
                 }
-            }
 
-            player.playSound(true) {
-                type(BukkitSound.BLOCK_NOTE_BLOCK_PLING)
-                pitch(0f)
+                player.playSound(true) {
+                    type(BukkitSound.BLOCK_NOTE_BLOCK_PLING)
+                    pitch(0f)
+                }
             }
         }
     }
@@ -251,22 +248,18 @@ object FinaleLifecycle {
 
 
                 appendAnarchyPrefix()
-                info("Das Finale hat begonnen.")
+                info("Das Finale hat begonnen.", TextDecoration.BOLD)
                 appendNewline()
 
                 appendAnarchyPrefix()
                 appendNewline()
 
                 appendAnarchyPrefix()
-                error("Der Nether und das End sind")
+                error("Der Nether und das End sind".toSmallCaps())
                 appendNewline()
 
                 appendAnarchyPrefix()
-                error("nun geschlossen — verlasse sie")
-                appendNewline()
-
-                appendAnarchyPrefix()
-                error("sofort, sonst stirbst du!")
+                error("nun geschlossen — verlasse sie sofort!".toSmallCaps())
                 appendNewline()
 
                 appendAnarchyPrefix()
@@ -278,6 +271,11 @@ object FinaleLifecycle {
             player.playSound(true) {
                 type(BukkitSound.BLOCK_NOTE_BLOCK_PLING)
                 pitch(1f)
+            }
+
+            player.playSound(true) {
+                type(BukkitSound.ENTITY_WITHER_SPAWN)
+                pitch(0f)
             }
         }
 
@@ -303,13 +301,6 @@ object FinaleLifecycle {
                 }
 
                 player.damage(damage)
-                player.sendActionBar(buildText {
-                    error("⚠")
-                    appendSpace()
-                    darkSpacer("|")
-                    appendSpace()
-                    geilesRot("Verlasse den Nether und das End, sonst stirbst du!")
-                })
             }, null)
         }
     }

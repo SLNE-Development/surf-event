@@ -3,6 +3,7 @@ package dev.slne.surf.event.anarchy
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
 import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.api.paper.hook.papi.SurfPaperPAPIHook
+import dev.slne.surf.event.anarchy.finale.FinaleActionbarTask
 import dev.slne.surf.event.anarchy.finale.FinaleLifecycle
 import dev.slne.surf.event.anarchy.finale.command.finaleCommand
 import dev.slne.surf.event.anarchy.finale.command.vertBorderCommand
@@ -12,6 +13,7 @@ import dev.slne.surf.event.anarchy.finale.listener.FinaleDimensionListener
 import dev.slne.surf.event.anarchy.papi.AnarchyPlaceholderExpansion
 import dev.slne.surf.event.anarchy.vertborder.VertBorderService
 import dev.slne.surf.event.anarchy.vertborder.listener.VertBorderListener
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
@@ -19,6 +21,7 @@ val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
 class PaperMain : SuspendingJavaPlugin() {
     override suspend fun onEnableAsync() {
         FinaleLifecycle.create()
+        FinaleActionbarTask.start()
 
         VertBorderListener.register()
         FinaleDimensionListener.register()
@@ -30,10 +33,12 @@ class PaperMain : SuspendingJavaPlugin() {
         vertBorderCommand()
 
         SurfPaperPAPIHook.register(AnarchyPlaceholderExpansion)
+        Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord")
     }
 
     override suspend fun onDisableAsync() {
         VertBorderService.stop()
+        FinaleActionbarTask.stop()
         FinaleLifecycle.cancel()
     }
 }

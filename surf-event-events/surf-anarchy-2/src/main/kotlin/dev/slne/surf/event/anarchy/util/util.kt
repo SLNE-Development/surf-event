@@ -41,7 +41,12 @@ fun formatCountdownTime(totalSeconds: Long): String {
     val minutes = (totalSeconds % 3_600) / 60
     val seconds = totalSeconds % 60
 
-    return "%02d:%02d:%02d:%02d".format(days, hours, minutes, seconds)
+    return when {
+        days > 0 -> "%02d:%02d:%02d:%02d".format(days, hours, minutes, seconds)
+        hours > 0 -> "%02d:%02d:%02d".format(hours, minutes, seconds)
+        minutes > 0 -> "%02d:%02d".format(minutes, seconds)
+        else -> "%ds".format(seconds)
+    }
 }
 
 fun SurfComponentBuilder.appendAnarchyBar() = append {
