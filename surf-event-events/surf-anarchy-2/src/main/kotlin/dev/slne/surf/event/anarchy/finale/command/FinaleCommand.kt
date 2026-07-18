@@ -52,6 +52,12 @@ fun finaleCommand() = commandTree("finale") {
         }
     }
 
+    literalArgument("lockOverworld") {
+        anyExecutor { sender, _ ->
+            lockOverworld(sender)
+        }
+    }
+
     literalArgument("reset") {
         anyExecutor { sender, _ ->
             FinaleLifecycle.resetAll()
@@ -80,6 +86,11 @@ fun finaleCommand() = commandTree("finale") {
                 info("Finale-Dauer (bis finale Border): ")
                 variableValue(formatCountdownTime(FinaleLifecycle.finaleDuration.inWholeSeconds))
 
+                appendNewline()
+                appendAnarchyPrefix()
+                info("Overworld gesperrt: ")
+                variableValue(FinaleLifecycle.isOverworldLocked().toString())
+
                 FinaleLifecycle.secondsUntilStart()?.let { seconds ->
                     appendNewline()
                     appendAnarchyPrefix()
@@ -94,6 +105,25 @@ fun finaleCommand() = commandTree("finale") {
                     variableValue(formatCountdownTime(seconds))
                 }
             }
+        }
+    }
+}
+
+private fun lockOverworld(sender: CommandSender) {
+    when (FinaleLifecycle.lockOverworld()) {
+        FinaleLifecycle.OverworldLockResult.NOT_RUNNING -> sender.sendText {
+            appendAnarchyPrefix()
+            error("Derzeit läuft kein Finale.")
+        }
+
+        FinaleLifecycle.OverworldLockResult.ALREADY_LOCKED -> sender.sendText {
+            appendAnarchyPrefix()
+            error("Die Overworld ist bereits gesperrt!")
+        }
+
+        FinaleLifecycle.OverworldLockResult.OK -> sender.sendText {
+            appendAnarchyPrefix()
+            success("Die Overworld ist nun gesperrt.")
         }
     }
 }

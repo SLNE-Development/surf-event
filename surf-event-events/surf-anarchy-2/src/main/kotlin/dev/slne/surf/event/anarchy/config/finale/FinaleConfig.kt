@@ -8,4 +8,5 @@ data class FinaleConfig(
     var start: ZonedDateTime? = null,
     var finaleDurationMinutes: Int? = null,
     var startedAt: ZonedDateTime? = null,
+    var overworldLockedAt: ZonedDateTime? = null,
 )

@@ -20,9 +20,9 @@ import dev.slne.surf.event.anarchy.vertborder.VertBorderManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.World
+import org.bukkit.entity.Player
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.util.concurrent.ConcurrentHashMap
@@ -35,6 +35,13 @@ import kotlin.time.Duration.Companion.seconds
 object FinaleLifecycle {
     private val WARN_BEFORE_START = 1.hours
     val DEFAULT_FINALE_DURATION = 5.minutes
+
+    private const val OVERWORLD_FINALE_BORDER_SIZE = 3000.0
+    private const val OVERWORLD_RESET_SIZE = 7500.0
+
+    private const val FINALE_DAMAGE_FLOOR = 4.0
+    private const val FINALE_DAMAGE_MAX = 50.0
+    private val FINALE_DAMAGE_RAMP = 60.seconds
 
     var finaleDuration: kotlin.time.Duration = DEFAULT_FINALE_DURATION
         private set
@@ -52,6 +59,10 @@ object FinaleLifecycle {
     private var started = false
     private val announcedMarks = ConcurrentHashMap.newKeySet<Long>()
 
+    private var overworldLockedAt: ZonedDateTime? = null
+
+    enum class OverworldLockResult { OK, NOT_RUNNING, ALREADY_LOCKED }
+
     private lateinit var tickJob: Job
 
     suspend fun create() {
@@ -67,6 +78,7 @@ object FinaleLifecycle {
 
     fun isScheduled() = startAt != null && !started
     fun isRunning() = started
+    fun isOverworldLocked() = overworldLockedAt != null
 
     fun secondsUntilStart(): Long? {
         val start = startAt ?: return null
@@ -111,11 +123,13 @@ object FinaleLifecycle {
         started = false
         finaleDuration = DEFAULT_FINALE_DURATION
         announcedMarks.clear()
+        overworldLockedAt = null
 
         AnarchyConfig.edit {
             finaleConfig.start = null
             finaleConfig.finaleDurationMinutes = null
             finaleConfig.startedAt = null
+            finaleConfig.overworldLockedAt = null
         }
     }
 
@@ -133,34 +147,36 @@ object FinaleLifecycle {
             finaleDuration = duration
             announcedMarks.clear()
 
-            val remainingSeconds = (duration.inWholeSeconds -
-                    Duration.between(savedStartedAt, ZonedDateTime.now()).seconds)
-                .coerceAtLeast(0)
-            shrinkBorders(remainingSeconds.seconds)
+            setOverworldFinaleBorder()
+
+            overworldLockedAt = config.overworldLockedAt
         } else {
-            // Noch nicht gestartet -> neu einplanen; liegt der Start bereits in der
-            // Vergangenheit (Server war offline), startet der naechste Tick das Finale sofort
             applySchedule(savedStart, duration)
         }
     }
 
     fun resetAll() {
-        val world = Bukkit.getWorlds().first()
-
         cancelFinale()
-        with(world.worldBorder) {
-            size = 7500.0
-            setCenter(0.0, 0.0)
+
+        server.worlds.firstOrNull { it.environment == World.Environment.NORMAL }?.let { overworld ->
+            with(overworld.worldBorder) {
+                size = OVERWORLD_RESET_SIZE
+                setCenter(0.0, 0.0)
+            }
+            VertBorderManager.clearBorders(overworld)
         }
 
-        VertBorderManager.clearBorders(world)
+        server.worlds.firstOrNull { it.environment == World.Environment.THE_END }?.let { end ->
+            VertBorderManager.clearBorders(end)
+        }
     }
 
     private suspend fun tick() {
         val start = startAt ?: return
 
         if (started) {
-            damageDimensionPlayers()
+            damageNetherPlayers()
+            damageOverworldPlayers()
             return
         }
 
@@ -203,11 +219,11 @@ object FinaleLifecycle {
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    error("Der Nether und das End werden".toSmallCaps())
+                    error("Der Nether wird geschlossen -".toSmallCaps())
                     appendNewline()
 
                     appendAnarchyPrefix()
-                    error("geschlossen — verlasse sie rechtzeitig!".toSmallCaps())
+                    error("verlasse ihn rechtzeitig!".toSmallCaps())
                     appendNewline()
 
                     appendAnarchyPrefix()
@@ -254,11 +270,11 @@ object FinaleLifecycle {
                 appendNewline()
 
                 appendAnarchyPrefix()
-                error("Der Nether und das End sind".toSmallCaps())
+                error("Der Nether ist nun geschlossen -".toSmallCaps())
                 appendNewline()
 
                 appendAnarchyPrefix()
-                error("nun geschlossen — verlasse sie sofort!".toSmallCaps())
+                error("verlasse ihn sofort!".toSmallCaps())
                 appendNewline()
 
                 appendAnarchyPrefix()
@@ -278,12 +294,60 @@ object FinaleLifecycle {
             }
         }
 
-        shrinkBorders()
+        setOverworldFinaleBorder()
     }
 
-    private fun damageDimensionPlayers() {
-        val since = startedAt ?: return
-        val damage = dimensionDamagePerSecond(Duration.between(since, ZonedDateTime.now()))
+    fun lockOverworld(): OverworldLockResult {
+        if (!started) return OverworldLockResult.NOT_RUNNING
+        if (overworldLockedAt != null) return OverworldLockResult.ALREADY_LOCKED
+
+        val now = ZonedDateTime.now()
+        overworldLockedAt = now
+
+        AnarchyConfig.edit {
+            finaleConfig.overworldLockedAt = now
+        }
+
+        broadcastOverworldLock()
+
+        return OverworldLockResult.OK
+    }
+
+    private fun broadcastOverworldLock() {
+        forEachPlayer { player ->
+            player.sendText {
+                appendAnarchyBar()
+                appendNewline()
+
+                appendAnarchyPrefix()
+                appendNewline()
+
+                appendAnarchyPrefix()
+                error("Die Overworld ist nun gesperrt.".toSmallCaps())
+                appendNewline()
+
+                appendAnarchyPrefix()
+                appendNewline()
+
+                appendAnarchyBar()
+            }
+
+            player.playSound(true) {
+                type(BukkitSound.ENTITY_WITHER_SPAWN)
+                pitch(0f)
+            }
+        }
+    }
+
+    private fun damageNetherPlayers() =
+        damageEnvironment(startedAt, World.Environment.NETHER)
+
+    private fun damageOverworldPlayers() =
+        damageEnvironment(overworldLockedAt, World.Environment.NORMAL)
+
+    private fun damageEnvironment(since: ZonedDateTime?, environment: World.Environment) {
+        val start = since ?: return
+        val damage = finaleDamagePerSecond(Duration.between(start, ZonedDateTime.now()))
         if (damage <= 0.0) {
             return
         }
@@ -294,33 +358,42 @@ object FinaleLifecycle {
                     return@run
                 }
 
-                val environment = player.world.environment
-                if (environment != World.Environment.NETHER && environment != World.Environment.THE_END) {
+                if (player.world.environment != environment) {
                     return@run
                 }
 
-                player.damage(damage)
+                applyTrueDamage(player, damage)
             }, null)
         }
     }
 
-    private fun dimensionDamagePerSecond(elapsed: Duration): Double {
-        val progress =
-            (elapsed.toMillis().toDouble() / 5.minutes.inWholeMilliseconds).coerceIn(0.0, 1.0)
-        return 50.0 * sqrt(progress)
+    private fun applyTrueDamage(player: Player, amount: Double) {
+        val newHealth = player.health - amount
+        if (newHealth <= 0.0) {
+            player.health = 0.0
+        } else {
+            player.health = newHealth
+            player.playHurtAnimation(0f)
+        }
     }
 
-    private suspend fun shrinkBorders(duration: kotlin.time.Duration = finaleDuration) {
-        val overworld = server.worlds.first { it.environment == World.Environment.NORMAL }
+    private fun finaleDamagePerSecond(elapsed: Duration): Double {
+        val progress =
+            (elapsed.toMillis().toDouble() / FINALE_DAMAGE_RAMP.inWholeMilliseconds)
+                .coerceIn(0.0, 1.0)
+        return FINALE_DAMAGE_FLOOR + (FINALE_DAMAGE_MAX - FINALE_DAMAGE_FLOOR) * sqrt(progress)
+    }
+
+    private fun overworldOrNull() =
+        server.worlds.firstOrNull { it.environment == World.Environment.NORMAL }
+
+    private suspend fun setOverworldFinaleBorder() {
+        val overworld = overworldOrNull() ?: return
 
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                if (duration.inWholeSeconds <= 0) {
-                    size = 50.0
-                } else {
-                    changeSize(50.0, duration.inWholeSeconds * 20)
-                }
+                size = OVERWORLD_FINALE_BORDER_SIZE
             }
         }
     }

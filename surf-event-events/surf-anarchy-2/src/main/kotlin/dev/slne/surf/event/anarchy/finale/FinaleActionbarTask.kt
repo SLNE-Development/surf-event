@@ -24,13 +24,13 @@ object FinaleActionbarTask {
                     Bukkit.getOnlinePlayers().count { it.gameMode == GameMode.SURVIVAL }
 
                 forEachPlayer {
-                    if ((it.gameMode == GameMode.SURVIVAL || it.gameMode == GameMode.ADVENTURE) && (it.world.environment != World.Environment.NORMAL)) {
+                    if ((it.gameMode == GameMode.SURVIVAL || it.gameMode == GameMode.ADVENTURE) && (it.world.environment == World.Environment.NETHER)) {
                         it.sendActionBar(buildText {
                             error("⚠")
                             appendSpace()
                             darkSpacer("|")
                             appendSpace()
-                            geilesRot("Verlasse den Nether und das End, sonst stirbst du!")
+                            geilesRot("Verlasse den Nether, sonst stirbst du!")
                         })
                     } else {
                         it.sendActionBar(buildText {

@@ -100,11 +100,7 @@ object VertBorderManager {
         animationTasks.remove(world.uid to border)?.cancel()
     }
 
-    /**
-     * Fully removes a vertical border again: stops any running animation and clears the stored
-     * height so [borderHeight] returns `null` — i.e. no plane, no warnings and no damage, exactly
-     * like a fresh server start where nothing was ever set.
-     */
+
     fun clearBorder(world: World, border: VerticalBorderAlignment) {
         stopAnimation(world, border)
 

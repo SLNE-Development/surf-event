@@ -7,6 +7,7 @@ import dev.slne.surf.event.anarchy.util.appendAnarchyPrefix
 import dev.slne.surf.event.anarchy.vertborder.VertBorderManager
 import dev.slne.surf.event.anarchy.vertborder.border.VerticalBorderAlignment
 import org.bukkit.Bukkit
+import org.bukkit.World
 import kotlin.time.Duration.Companion.minutes
 
 fun vertBorderCommand() = commandTree("vertborder") {
@@ -21,7 +22,14 @@ fun vertBorderCommand() = commandTree("vertborder") {
                         val height: Double by arguments
                         val minutes: Int by arguments
 
-                        val world = Bukkit.getWorlds().first()
+                        val world = endWorldOrNull()
+                        if (world == null) {
+                            sender.sendText {
+                                appendAnarchyPrefix()
+                                error("Es wurde keine End-Welt gefunden!")
+                            }
+                            return@anyExecutor
+                        }
                         val alignment =
                             if (type == "top") VerticalBorderAlignment.TOP else VerticalBorderAlignment.BOTTOM
 
@@ -42,7 +50,14 @@ fun vertBorderCommand() = commandTree("vertborder") {
             anyExecutor { sender, arguments ->
                 val type: String by arguments
 
-                val world = Bukkit.getWorlds().first()
+                val world = endWorldOrNull()
+                if (world == null) {
+                    sender.sendText {
+                        appendAnarchyPrefix()
+                        error("Es wurde keine End-Welt gefunden!")
+                    }
+                    return@anyExecutor
+                }
                 val alignment =
                     if (type == "top") VerticalBorderAlignment.TOP else VerticalBorderAlignment.BOTTOM
 
@@ -61,7 +76,14 @@ fun vertBorderCommand() = commandTree("vertborder") {
             anyExecutor { sender, arguments ->
                 val type: String by arguments
 
-                val world = Bukkit.getWorlds().first()
+                val world = endWorldOrNull()
+                if (world == null) {
+                    sender.sendText {
+                        appendAnarchyPrefix()
+                        error("Es wurde keine End-Welt gefunden!")
+                    }
+                    return@anyExecutor
+                }
                 val alignment =
                     if (type == "top") VerticalBorderAlignment.TOP else VerticalBorderAlignment.BOTTOM
 
@@ -75,3 +97,6 @@ fun vertBorderCommand() = commandTree("vertborder") {
         }
     }
 }
+
+private fun endWorldOrNull() =
+    Bukkit.getWorlds().firstOrNull { it.environment == World.Environment.THE_END }
