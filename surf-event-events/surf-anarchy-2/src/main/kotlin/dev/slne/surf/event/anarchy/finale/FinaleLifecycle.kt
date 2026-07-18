@@ -36,7 +36,7 @@ object FinaleLifecycle {
     private val WARN_BEFORE_START = 1.hours
     val DEFAULT_FINALE_DURATION = 5.minutes
 
-    private const val OVERWORLD_FINALE_BORDER_SIZE = 3000.0
+    private const val OVERWORLD_FINALE_BORDER_SIZE = 6000.0
     private const val OVERWORLD_RESET_SIZE = 7500.0
 
     private const val FINALE_DAMAGE_FLOOR = 4.0
@@ -393,7 +393,7 @@ object FinaleLifecycle {
         withContext(plugin.globalRegionDispatcher) {
             with(overworld.worldBorder) {
                 setCenter(0.0, 0.0)
-                size = OVERWORLD_FINALE_BORDER_SIZE
+                changeSize(OVERWORLD_FINALE_BORDER_SIZE, finaleDuration.inWholeSeconds * 20)
             }
         }
     }
